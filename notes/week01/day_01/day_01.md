@@ -40,10 +40,23 @@ Types of AI systems:
         
         Example: IBM’s Deep Blue chess computer or basic email spam filters
 
+        Limited Memory AI: These systems can store past data and information for a short period to make better decisions. Most modern machine learning applications fall here.
+        
+        Example: Self-driving cars (which track the speed/direction of other cars over time) and LLMs (which remember the context of your chat history).
 
-How LLMs work: tokens, next-token prediction, context windows
+        Theory of Mind AI: A highly advanced, experimental stage of AI. These systems would be able to understand human emotions, beliefs, and thoughts, adjusting their behaviour based on the psychological state of the user.
+
+
+        Self-Aware AI: A purely theoretical extension of Theory of Mind. These systems would possess their own consciousness, self-awareness, and desires—essentially becoming sentient.
 
 
 What are LLMs? 
+    These are artificial intelligence systems that are trained on massive amount of text to understand, summarize, translate and generate human-like language. 
 
-These are artificial intelligence systems 
+    How LLMs work: tokens, next-token prediction, context windows??
+    Most LLMs use a deep learning framework called a transformer, which relies on a "self-attention" mechanisim to process words in relation to one another across entire sentences. 
+
+
+
+
+
