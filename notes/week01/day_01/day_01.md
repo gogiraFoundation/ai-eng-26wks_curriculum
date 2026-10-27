@@ -51,10 +51,71 @@ Types of AI systems:
 
 
 What are LLMs? 
+    
     These are artificial intelligence systems that are trained on massive amount of text to understand, summarize, translate and generate human-like language. 
 
     How LLMs work: tokens, next-token prediction, context windows??
-    Most LLMs use a deep learning framework called a transformer, which relies on a "self-attention" mechanisim to process words in relation to one another across entire sentences. 
+    
+        Most LLMs use a deep learning framework called a transformer, which relies on a "self-attention" mechanisim to process words in relation to one another across entire sentences.
+        
+
+        At their core, LLMs perform complex statistical task, by predicting the next piece of text called a token ( tokens can be  whole word or part of a word) based on the input they receive.
+
+        models are first pretrained on large digital datasets using sef-supervised learning, then refined through techniques like reinforcement learning from human feedback to follow instructions safely. 
+
+
+        common examples are CHATGPT BY OPENAI, CLAUDE BY ANTHROPIC, GEMINI ETC
+
+        LLMs at the core of it, are highly advance patten-matching engines that calculate probablities based on three fundamental concepts; tokens, next-token prediction, and context windows.
+
+
+        1. What are Tokens??
+
+            LLMs do not read words as strings of text, instead they are broken down into smaller pieces called tokens. Every token is
+            mapped to a unique numerical id, which in turn allows the models to compress vast amount of data and easily find mathematical relationships between words.
+            
+        
+        
+        2. Next-Token Prediction
+        
+            At its absolute core, an LLM only does one mathematical task over and over: it looks at a sequence of tokens and predicts the most likely next token.
+
+            Probability Maps: If you type "The cat sat on the", the model calculates a mathematical probability for thousands of possible next tokens. mat might have a 60% probability, floor might have a 25% probability, and moon might have a 0.001% probability.
+
+            The "Self-Attention" Mechanism: The model uses the Transformer architecture to look at all the words in your prompt simultaneously. It weighs which words are most important to the context. In the sentence "The bank of the river was muddy," the attention mechanism links "bank" to "river" so it knows you mean a piece of land, not a financial building.
+
+            Creativity (Temperature): If the model always picked the token with the highest probability, its responses would be completely rigid and repetitive. LLMs use a setting called "temperature" to occasionally pick the 2nd or 3rd most likely token, making the output feel more creative and human-like.
+            
+        
+        3. Context Windows
+
+                The context window is the total capacity or "memory limit" of the AI during a single conversation. It dictates how much text the model can look at when predicting the next token.
+
+                In and Out: The context window includes both the text you type in (your prompt) and the text the AI generates back to you.
+
+                The Invisible Limit: If a model has a context window of 8,000 tokens, it can only hold about 6,000 words in its short-term memory at one time.
+                
+                What Happens When It Fills Up? Once a conversation exceeds the context window, the model experiences "forgetting." It drops the oldest tokens from the beginning of the chat to make room for new ones. If you ask a question about something you said 20 pages ago, it will no longer have access to that information.
+
+                (Note: Newer models have massive context windows—ranging from 128,000 to over 1 million tokens—allowing them to remember entire books or codebases in a single session.)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
