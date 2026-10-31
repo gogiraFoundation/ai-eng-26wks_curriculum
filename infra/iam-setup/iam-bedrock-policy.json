@@ -46,7 +46,9 @@
     ]
 }
 
-# Deny access for inference of foundation models
+# Deny on-demand foundation-model inference only.
+# An explicit Deny on "*" would override the provisioned-model and inference-profile Allows.
+# Calls through an inference profile also authorise the foundation model, so those stay allowed.
 
 {
     "Version": "2012-10-17",
@@ -57,16 +59,22 @@
             "Action": [
                 "bedrock:InvokeModel",
                 "bedrock:InvokeModelWithResponseStream",
-                "bedrock:ListFoundationModels",
                 "bedrock:CreateModelInvocationJob"
-
             ],
-            "Resource": ["*"]
+            "Resource": [
+                "arn:aws:bedrock:*::foundation-model/*"
+            ],
+            "Condition": {
+                "Null": {
+                    "bedrock:InferenceProfileArn": "true"
+                }
+            }
         }
     ]
 }
 
-# Allow users to invoke a provisioned model
+# Allow users to invoke a provisioned model.
+# Region and account use "*" because IAM policy variables are valid only after the fifth colon of an ARN.
 
 {
     "Version":"2012-10-17",
@@ -78,13 +86,14 @@
                 "bedrock:InvokeModel",
                 "bedrock:InvokeModelWithResponseStream"
             ],
-            "Resource": "arn:aws:bedrock:us-east-1:123456789012:provisioned-model/my-provisioned-model"
+            "Resource": "arn:aws:bedrock:*:*:provisioned-model/*"
         }
     ]
 }
 
 
-# Minimal policy for Amazon Bedrock Playground chat
+# Minimal policy for Amazon Bedrock Playground chat.
+# The inference-profile ARN uses "*" for region and account. Policy variables are not valid in those fields.
 
 {
     "Version": "2012-10-17", 
@@ -127,7 +136,7 @@
             ],
             "Resource": [
                 "arn:aws:bedrock:*::foundation-model/*",
-                "arn:aws:bedrock:<region>:<account-id>:inference-profile/*"
+                "arn:aws:bedrock:*:*:inference-profile/*"
             ]
         },
         {
