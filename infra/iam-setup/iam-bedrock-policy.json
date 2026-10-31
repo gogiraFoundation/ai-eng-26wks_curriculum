@@ -11,6 +11,140 @@
             "Effect": "Allow",
             "Action": [
                 "iam:GetUserPolicy",
+                "iam:ListGroupsForUser",
+                "iam:ListAttachedUserPolicies",
+                "iam:ListUserPolicies",
+                "iam:GetUser"
+            ],
+            "Resource": ["arn:aws:iam::*:user/${aws:username}"]
+
+        },
+        {
+            "Sid": "NavigateInConsole",
+            "Effect": "Allow",
+            "Action": [
+                "iam:GetGroupPolicy",
+                "iam:GetGroupPolicyVersion",
+                "iam:GetPolicyVersion",
+                "iam:GetPolicy",
+                "iam:ListAttachedGroupPolicies",
+                "iam:ListGroupPolicies",
+                "iam:ListAttachedRolePolicies",
+                "iam:ListRolePolicies",
+                "iam:ListAttachedUserPolicies",
+                "iam:ListUserPolicies",
+                "iam:ListAttachedGroupPolicies",
+                "iam:ListGroupPolicies",
+                "iam:ListUsers",
+                "iam:ListRoles",
+                "iam:ListPolicies",
+                "iam:ListPolicyVersions"
+            
+            ],
+            "Resource": ["*"]
         }
     ]
 }
+
+# Deny access for inference of foundation models
+
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "DenyInferenceOfFoundationModels",
+            "Effect": "Deny",
+            "Action": [
+                "bedrock:InvokeModel",
+                "bedrock:InvokeModelWithResponseStream",
+                "bedrock:ListFoundationModels",
+                "bedrock:CreateModelInvocationJob"
+
+            ],
+            "Resource": ["*"]
+        }
+    ]
+}
+
+# Allow users to invoke a provisioned model
+
+{
+    "Version":"2012-10-17",
+    "Statement": [
+        {
+            "Sid": "ProvisionedThroughputModelInvocation",
+            "Effect": "Allow",
+            "Action": [
+                "bedrock:InvokeModel",
+                "bedrock:InvokeModelWithResponseStream"
+            ],
+            "Resource": "arn:aws:bedrock:us-east-1:123456789012:provisioned-model/my-provisioned-model"
+        }
+    ]
+}
+
+
+# Minimal policy for Amazon Bedrock Playground chat
+
+{
+    "Version": "2012-10-17", 
+    "Statement": [
+        {
+            "Sid": "BedrockConsoleRead",
+            "Effect": "Allow",
+            "Action": [
+                "bedrock:ListFoundationModels",
+                "bedrock:ListInferenceProfiles",
+                "bedrock:ListProvisionedModelThroughputs",
+                "bedrock:ListCustomModels",
+                "bedrock:ListGuardrails",
+                "bedrock:ListFoundationModelAgreementOffers",
+                "bedrock:ListMarketplaceModelEndpoints",
+                "bedrock:ListImportedModels",
+                "bedrock:ListPromptRouters",
+                "bedrock:GetFoundationModel",
+                "bedrock:GetFoundationModelAvailability",
+                "bedrock:GetInferenceProfile",
+                "bedrock:GetUseCaseForModelAccess",
+                "bedrock:PutUseCaseForModelAccess"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "SageMakerHubRead",
+            "Effect": "Allow",
+            "Action": [
+                "sagemaker:ListHubContents"
+            ],
+            "Resource": "arn:aws:sagemaker:*:aws:hub/SageMakerPublicHub"
+        },
+        {
+            "Sid": "InvokeModel",
+            "Effect": "Allow",
+            "Action": [
+                "bedrock:InvokeModel",
+                "bedrock:InvokeModelWithResponseStream"
+            ],
+            "Resource": [
+                "arn:aws:bedrock:*::foundation-model/*",
+                "arn:aws:bedrock:<region>:<account-id>:inference-profile/*"
+            ]
+        },
+        {
+            "Sid": "MarketplaceSubscription",
+            "Effect": "Allow",
+            "Action": [
+                "aws-marketplace:ViewSubscriptions",
+                "aws-marketplace:Subscribe"
+            ],
+            "Resource": "*",
+            "Condition": {
+                "StringEquals": {
+                    "aws:CalledViaLast": "bedrock.amazonaws.com"
+                }
+            }
+        }
+    ]
+}
+
+
