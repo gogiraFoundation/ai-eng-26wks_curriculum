@@ -1,159 +1,97 @@
-# IAM Bedrock Policy
-
-# This policy is used to grant permissions to the bedrock model.
-# Allow users to view their own permissions
-
 {
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "ViewOwnUserInfo",
-            "Effect": "Allow",
-            "Action": [
-                "iam:GetUserPolicy",
-                "iam:ListGroupsForUser",
-                "iam:ListAttachedUserPolicies",
-                "iam:ListUserPolicies",
-                "iam:GetUser"
-            ],
-            "Resource": ["arn:aws:iam::*:user/${aws:username}"]
-
-        },
-        {
-            "Sid": "NavigateInConsole",
-            "Effect": "Allow",
-            "Action": [
-                "iam:GetGroupPolicy",
-                "iam:GetGroupPolicyVersion",
-                "iam:GetPolicyVersion",
-                "iam:GetPolicy",
-                "iam:ListAttachedGroupPolicies",
-                "iam:ListGroupPolicies",
-                "iam:ListAttachedRolePolicies",
-                "iam:ListRolePolicies",
-                "iam:ListAttachedUserPolicies",
-                "iam:ListUserPolicies",
-                "iam:ListAttachedGroupPolicies",
-                "iam:ListGroupPolicies",
-                "iam:ListUsers",
-                "iam:ListRoles",
-                "iam:ListPolicies",
-                "iam:ListPolicyVersions"
-            
-            ],
-            "Resource": ["*"]
-        }
-    ]
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ViewOwnUserInfo",
+      "Effect": "Allow",
+      "Action": [
+        "iam:GetUser",
+        "iam:GetUserPolicy",
+        "iam:ListGroupsForUser",
+        "iam:ListAttachedUserPolicies",
+        "iam:ListUserPolicies"
+      ],
+      "Resource": "arn:aws:iam::*:user/${aws:username}"
+    },
+    {
+      "Sid": "NavigateInConsole",
+      "Effect": "Allow",
+      "Action": [
+        "iam:GetGroupPolicy",
+        "iam:GetPolicy",
+        "iam:GetPolicyVersion",
+        "iam:ListAttachedGroupPolicies",
+        "iam:ListGroupPolicies",
+        "iam:ListAttachedRolePolicies",
+        "iam:ListRolePolicies",
+        "iam:ListUsers",
+        "iam:ListRoles",
+        "iam:ListPolicies",
+        "iam:ListPolicyVersions"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "BedrockConsoleRead",
+      "Effect": "Allow",
+      "Action": [
+        "bedrock:ListFoundationModels",
+        "bedrock:ListInferenceProfiles",
+        "bedrock:ListProvisionedModelThroughputs",
+        "bedrock:ListCustomModels",
+        "bedrock:ListGuardrails",
+        "bedrock:ListFoundationModelAgreementOffers",
+        "bedrock:ListMarketplaceModelEndpoints",
+        "bedrock:ListImportedModels",
+        "bedrock:ListPromptRouters",
+        "bedrock:GetFoundationModel",
+        "bedrock:GetFoundationModelAvailability",
+        "bedrock:GetInferenceProfile",
+        "bedrock:GetUseCaseForModelAccess",
+        "bedrock:PutUseCaseForModelAccess"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "SageMakerHubRead",
+      "Effect": "Allow",
+      "Action": "sagemaker:ListHubContents",
+      "Resource": "arn:aws:sagemaker:*:aws:hub/SageMakerPublicHub"
+    },
+    {
+      "Sid": "InvokeViaProfilesAndProvisioned",
+      "Effect": "Allow",
+      "Action": [
+        "bedrock:InvokeModel",
+        "bedrock:InvokeModelWithResponseStream"
+      ],
+      "Resource": [
+        "arn:aws:bedrock:*::foundation-model/*",
+        "arn:aws:bedrock:*:*:inference-profile/*",
+        "arn:aws:bedrock:*:*:provisioned-model/*"
+      ]
+    },
+    {
+      "Sid": "ViewMarketplaceSubscriptions",
+      "Effect": "Allow",
+      "Action": "aws-marketplace:ViewSubscriptions",
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": { "aws:CalledViaLast": "bedrock.amazonaws.com" }
+      }
+    },
+    {
+      "Sid": "DenyDirectFoundationModelInference",
+      "Effect": "Deny",
+      "Action": [
+        "bedrock:InvokeModel",
+        "bedrock:InvokeModelWithResponseStream",
+        "bedrock:CreateModelInvocationJob"
+      ],
+      "Resource": "arn:aws:bedrock:*::foundation-model/*",
+      "Condition": {
+        "Null": { "bedrock:InferenceProfileArn": "true" }
+      }
+    }
+  ]
 }
-
-# Deny on-demand foundation-model inference only.
-# An explicit Deny on "*" would override the provisioned-model and inference-profile Allows.
-# Calls through an inference profile also authorise the foundation model, so those stay allowed.
-
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "DenyInferenceOfFoundationModels",
-            "Effect": "Deny",
-            "Action": [
-                "bedrock:InvokeModel",
-                "bedrock:InvokeModelWithResponseStream",
-                "bedrock:CreateModelInvocationJob"
-            ],
-            "Resource": [
-                "arn:aws:bedrock:*::foundation-model/*"
-            ],
-            "Condition": {
-                "Null": {
-                    "bedrock:InferenceProfileArn": "true"
-                }
-            }
-        }
-    ]
-}
-
-# Allow users to invoke a provisioned model.
-# Region and account use "*" because IAM policy variables are valid only after the fifth colon of an ARN.
-
-{
-    "Version":"2012-10-17",
-    "Statement": [
-        {
-            "Sid": "ProvisionedThroughputModelInvocation",
-            "Effect": "Allow",
-            "Action": [
-                "bedrock:InvokeModel",
-                "bedrock:InvokeModelWithResponseStream"
-            ],
-            "Resource": "arn:aws:bedrock:*:*:provisioned-model/*"
-        }
-    ]
-}
-
-
-# Minimal policy for Amazon Bedrock Playground chat.
-# The inference-profile ARN uses "*" for region and account. Policy variables are not valid in those fields.
-
-{
-    "Version": "2012-10-17", 
-    "Statement": [
-        {
-            "Sid": "BedrockConsoleRead",
-            "Effect": "Allow",
-            "Action": [
-                "bedrock:ListFoundationModels",
-                "bedrock:ListInferenceProfiles",
-                "bedrock:ListProvisionedModelThroughputs",
-                "bedrock:ListCustomModels",
-                "bedrock:ListGuardrails",
-                "bedrock:ListFoundationModelAgreementOffers",
-                "bedrock:ListMarketplaceModelEndpoints",
-                "bedrock:ListImportedModels",
-                "bedrock:ListPromptRouters",
-                "bedrock:GetFoundationModel",
-                "bedrock:GetFoundationModelAvailability",
-                "bedrock:GetInferenceProfile",
-                "bedrock:GetUseCaseForModelAccess",
-                "bedrock:PutUseCaseForModelAccess"
-            ],
-            "Resource": "*"
-        },
-        {
-            "Sid": "SageMakerHubRead",
-            "Effect": "Allow",
-            "Action": [
-                "sagemaker:ListHubContents"
-            ],
-            "Resource": "arn:aws:sagemaker:*:aws:hub/SageMakerPublicHub"
-        },
-        {
-            "Sid": "InvokeModel",
-            "Effect": "Allow",
-            "Action": [
-                "bedrock:InvokeModel",
-                "bedrock:InvokeModelWithResponseStream"
-            ],
-            "Resource": [
-                "arn:aws:bedrock:*::foundation-model/*",
-                "arn:aws:bedrock:*:*:inference-profile/*"
-            ]
-        },
-        {
-            "Sid": "MarketplaceSubscription",
-            "Effect": "Allow",
-            "Action": [
-                "aws-marketplace:ViewSubscriptions",
-                "aws-marketplace:Subscribe"
-            ],
-            "Resource": "*",
-            "Condition": {
-                "StringEquals": {
-                    "aws:CalledViaLast": "bedrock.amazonaws.com"
-                }
-            }
-        }
-    ]
-}
-
-
