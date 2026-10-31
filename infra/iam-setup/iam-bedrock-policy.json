@@ -1,0 +1,16 @@
+# IAM Bedrock Policy
+
+# This policy is used to grant permissions to the bedrock model.
+# Allow users to view their own permissions
+
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "ViewOwnUserInfo",
+            "Effect": "Allow",
+            "Action": [
+                "iam:GetUserPolicy",
+        }
+    ]
+}
