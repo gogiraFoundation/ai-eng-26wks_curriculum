@@ -7,6 +7,14 @@ Infrastructure and environment setup for the AI Engineer learning projects (AWS 
 **Region:** `eu-north-1` (Stockholm)
 **AWS CLI profile:** `agent-toolkit`
 
+## Files in this directory
+
+| Path | Role |
+|------|------|
+| `readme.md` | This setup guide |
+| `aws_setup.md` | Account checklist (budgets, MFA, profile). Do not commit keys |
+| `iam-setup/iam-bedrock-policy.json` | IAM policy document for Bedrock |
+
 ---
 
 ## 1. Overview
