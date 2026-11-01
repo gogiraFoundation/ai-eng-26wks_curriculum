@@ -76,3 +76,74 @@ The context window is the model's total capacity, or "memory limit", in a single
 
 **Why can the same text cost a different number of tokens on two models?**
 Each model uses its own tokenizer, which splits text into different subword pieces. So the token count differs, and since providers bill per token, so does the cost.
+
+
+---
+
+## Tokenizer experiment - 31 Oct
+
+I compared how different tokenizers split the same words, and ran OpenAI's tiktoken library to see the pieces each word breaks into.
+
+### Same input, different tokenizers
+
+*Column alignment was lost on the way into these notes, so the input words are provisional until I recheck them.*
+
+| Words | Tokenizer | Tokens | Characters | Why |
+| --- | --- | --- | --- | --- |
+| ? (to fill in) | Grok-1 | 1 | 3 | ? |
+| "Amazon 1+4" (unclear - possibly the input itself, to recheck) | ? | ? | ? | ? |
+| ? (to fill in) | Grok-1 | 6 | 11 | ? |
+| ? | Claude | 4 | 11 | ? |
+| ? | Llama 3 | 6 | 11 | ? |
+| ? | Gemma | 7 | 11 | ? |
+
+LLMs split words and sentences differently depending on the tokenizer used to process the model, which leads to differences in the number of tokens generated. As the table shows, most modern models use **subword tokenization** - a middle ground that keeps common words as single tokens and splits rare words into recognisable pieces. This is why:
+
+- Common words → fewer tokens → lower cost
+- Rare words, technical jargon, unusual vocabulary → more tokens → higher cost
+
+### Trying it in code with tiktoken (gpt-4o's encoding)
+
+```python
+import tiktoken
+enc = tiktoken.encoding_for_model("gpt-4o")
+words = ["hello", "understanding", "supercalifragilistic", "antidisestablishmentarianism"]
+
+for word in words:
+    tokens = enc.encode(word)
+    parts  = [enc.decode([t]) for t in tokens]
+    print(f"{word!r:35} → {len(tokens)} token(s): {parts}")
+```
+
+Sample output (reproduced by running the code with tiktoken 0.14.0 on 31 Oct - matches exactly):
+
+```
+'hello'                            → 1 token(s): ['hello']
+'understanding'                    → 2 token(s): ['under', 'standing']
+'supercalifragilistic'             → 6 token(s): ['super', 'cal', 'if', 'rag', 'il', 'istic']
+'antidisestablishmentarianism'     → 6 token(s): ['ant', 'idis', 'est', 'ablishment', 'arian', 'ism']
+```
+
+### Characters ≠ Words ≠ Tokens
+
+One of the most common misconceptions. Putting numbers to it:
+
+```python
+import tiktoken
+enc = tiktoken.encoding_for_model("gpt-4o")
+
+text = (
+    "The wise owl of the moonlight forest, where ancient trees stretch their branches toward the starry sky."
+)
+
+char_count  = len(text)
+token_count = len(enc.encode(text))
+
+print(f"Characters : {char_count}")                          # 103
+print(f"Tokens     : {token_count}")                         # 21
+print(f"Ratio      : {char_count / token_count:.1f} chars per token")  # 4.9
+```
+
+(Also reproduced with tiktoken 0.14.0: 103 characters, 21 tokens, 4.9 chars per token - exact match.)
+
+A rough rule of thumb for English: **1 token ≈ 4 characters ≈ 3/4 of a word.**
