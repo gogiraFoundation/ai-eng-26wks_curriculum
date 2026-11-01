@@ -9,6 +9,21 @@ A 26-week, project-based plan to become an AI / LLM engineer and pass the **AWS 
 **Background:** experienced Python / backend engineer
 **Cloud:** AWS, Region `eu-north-1`
 
+## What is in this folder
+
+The plan below is the syllabus. Checked in so far:
+
+| Path | Contents |
+|------|----------|
+| `README.md` | This 26-week plan |
+| `infra/readme.md` | AWS account and CLI setup for `eu-north-1` |
+| `infra/aws_setup.md` | Setup checklist |
+| `infra/iam-setup/iam-bedrock-policy.json` | Bedrock IAM policy |
+| `notes/week01/week01.md` | Week 1 schedule |
+| `notes/week01/day_01/`, `notes/week01/day_02/` | Day notes |
+
+Later weeks in the plan are not in the tree yet.
+
 ---
 
 ## Rules of the plan
