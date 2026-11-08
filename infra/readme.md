@@ -168,8 +168,8 @@ Scripts read `.env` with a line parser. They do not `source` it. Never commit `.
 |---|---|
 | `AWS_PROFILE` | CLI profile. Root for apply and teardown, IAM user for daily work |
 | `REGION` | Project Region, `eu-north-1` |
-| `AWS_ACCOUNT_ID` | Account check |
-| `AWS_IAM_USER_ARN` | Daily IAM user |
+| `AWS_ACCOUNT_ID` | Account check, and `__AWS_ACCOUNT_ID__` in IAM documents |
+| `AWS_IAM_USER_ARN` | Daily IAM user, and `__AWS_IAM_USER_ARN__` in the `llm-cli` trust policy |
 | `AWS_BUDGETS_REGION` | `us-east-1` |
 | `BUDGET_NAMES` | `MonthlyCostBudget` and `My Zero-Spend Budget` |
 

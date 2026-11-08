@@ -5,8 +5,8 @@ Wrappers for `../README.md`. They read `.env` and do not `source` it. `infra/run
 | Script | Does |
 | --- | --- |
 | `iam-groups.sh` | Create `IAM_GROUP_NAMES`. An existing group is left in place |
-| `iam-security.sh` | Create the customer managed policies and attach them to groups |
-| `iam-roles.sh` | Create `IAM_ROLE_NAME` and attach `IAM_ROLE_POLICIES` |
+| `iam-security.sh` | Create the customer managed policies, fill placeholders from `.env`, and attach them to groups. An attachment already present is skipped |
+| `iam-roles.sh` | Create `IAM_ROLE_NAME`, fill the trust policy from `.env`, and attach `IAM_ROLE_POLICIES`. An attachment already present is skipped |
 | `iam-assign-users.sh` | Put `AWS_IAM_USER_ARN` in `IAM_USER_GROUP` only, and detach policies on that user |
 | `iam-budgets.sh` | Read `BUDGET_NAMES` in `AWS_BUDGETS_REGION`. Does not create a budget |
 | `iam-destroy-resource.sh` | Undo the groups, customer policies, and role. Requires the argument `destroy` |
