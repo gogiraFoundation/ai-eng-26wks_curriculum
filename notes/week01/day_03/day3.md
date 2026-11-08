@@ -1,12 +1,19 @@
-# Day 03 notes: local Ollama API calls and metrics
+# Day 03: Local Ollama API Calls and Metrics
 
-Bedrock Converse is blocked on this account (`Error 002`). I practised the same measurement workflow against Ollama at `127.0.0.1:11434`: request an answer, inspect token usage, and measure latency.
+## Objective
 
-This practises transferable concepts, not the Bedrock Converse request/response format or AWS authentication.
+Bedrock Converse is blocked on this account (`Error 002`). I practised the equivalent measurement workflow using Ollama at `127.0.0.1:11434`: request an answer, inspect token usage, and measure latency.
 
-Prerequisite: start `ollama serve` if Ollama is not already running. Installed models: `llama3.2:latest` and `qwen2.5:7b`.
+This develops transferable skills, but does not replace practice with AWS authentication or the Bedrock Converse request/response format.
 
-## Field map: Ollama `/api/chat`, `stream: false`
+## Setup
+
+- Start `ollama serve` if Ollama is not already running.
+- Installed models: `llama3.2:latest` and `qwen2.5:7b`.
+- Python script: `src/local/day_3_chats.py`.
+- Endpoint: `/api/chat`, with `stream: false`.
+
+## Understanding the response fields
 
 | Field | Meaning | Unit |
 |---|---|---|
@@ -25,11 +32,11 @@ Conversions:
 - Milliseconds: `ns / 1e6`
 - Generation rate: `eval_count / (eval_duration / 1e9)`
 
-Generation rate excludes model loading and prompt processing. Ollama's `total_duration` is not a separate client-side measurement; measure elapsed time around the HTTP request to include client and network overhead.
+Generation rate excludes model loading and prompt processing. Only calculate it when `eval_duration` is greater than zero.
 
-Bedrock Converse reports service latency in `metrics.latencyMs`.
+Ollama's `total_duration` is server-reported. Measure client elapsed time separately around the HTTP request to include overhead outside that reported duration.
 
-## Run 1: vague prompt
+## Run 1: Vague prompt with `llama3.2`
 
 ```bash
 curl http://127.0.0.1:11434/api/chat \
@@ -49,11 +56,11 @@ curl http://127.0.0.1:11434/api/chat \
 | Model-loading duration | 1.80 s |
 | Approximate generation rate | 47 tokens/s |
 
-Observation: the API returned a complete response, but the answer contained multiple sentences. Successful response delivery does not guarantee instruction-following.
+The API returned a complete response, but the answer contained multiple sentences. Successful delivery does not guarantee instruction-following.
 
-The prompt also supplied no topic, so asking for clarification was reasonable; the sentence-count requirement was the part it missed.
+The prompt supplied no topic, so asking for clarification was reasonable. The sentence-count requirement was the part the model missed.
 
-## Run 2: same vague prompt again
+## Run 2: Repeat of the vague prompt
 
 | Metric | Value |
 |---|---:|
@@ -69,15 +76,13 @@ Answer:
 
 > I'm happy to help, but it seems like you didn't specify what you need assistance with.
 
-Observation: this answer followed the one-sentence instruction and asked for clarification. It was not a refusal.
+This answer followed the one-sentence instruction and asked for clarification. It was not a refusal.
 
-The substantial reported loading duration means this was not a clean low-load comparison. The response alone does not establish why loading took that long or confirm the model's residency before the call.
+The substantial reported loading duration means this was not a clean warm-model comparison. The timing alone does not establish why loading took that long.
 
-Model residency and prompt caching are separate mechanisms.
+## Run 3: Clearer prompt with explicit retention
 
-## Run 3: clearer prompt with explicit retention
-
-I supplied a topic, set `temperature` to zero, and requested that Ollama keep the model loaded for ten minutes after the request.
+I supplied a topic, set `temperature` to zero, and requested ten minutes of model retention with `keep_alive`.
 
 ```bash
 curl http://127.0.0.1:11434/api/chat \
@@ -91,17 +96,19 @@ curl http://127.0.0.1:11434/api/chat \
   }'
 ```
 
-### First call
+### Results
 
-| Metric | Value |
-|---|---:|
-| Input tokens | 37 |
-| Output tokens | 51 |
-| Cached prompt tokens | 0 |
-| Model-loading duration | 1.05 s |
-| Prompt-processing duration | 0.136 s |
-| Output-generation duration | 1.08 s |
-| Reported total duration | 2.27 s |
+The second call was made approximately three minutes after the first.
+
+| Metric | Call 1 | Call 2 |
+|---|---:|---:|
+| Input tokens | 37 | 37 |
+| Output tokens | 51 | 51 |
+| Cached prompt tokens | 0 | 36 |
+| Model-loading duration | 1.05 s | 0.0027 s |
+| Prompt-processing duration | 0.136 s | 0.037 s |
+| Output-generation duration | 1.08 s | 1.09 s |
+| Reported total duration | 2.27 s | 1.14 s |
 
 Recorded answer:
 
@@ -109,35 +116,54 @@ Recorded answer:
 
 The answer met the one-sentence requirement. More precisely, idempotency concerns the intended effect on server state; repeated requests need not return identical responses.
 
-### Second call, approximately three minutes later
+The answer text matched across these two calls. Temperature zero reduces sampling variability, but does not guarantee identical output across all runs, hardware, or software versions.
 
-| Metric | Value |
-|---|---:|
-| Input tokens | 37 |
-| Output tokens | 51 |
-| Cached prompt tokens | 36 of 37 |
-| Model-loading duration | 2.7 ms |
-| Prompt-processing duration | 0.037 s |
-| Output-generation duration | 1.09 s |
-| Reported total duration | 1.14 s |
-
-The answer text matched the first call exactly in this experiment. Temperature zero reduces sampling variability, but does not guarantee identical output across all runs, hardware, or software versions.
-
-## What changed between the two retention-test calls?
+### Interpretation
 
 | Mechanism | Evidence |
 |---|---|
-| Model residency | Loading dropped from 1.05 s to 2.7 ms, consistent with model reuse |
-| Prompt caching | Cached tokens increased from 0 to 36; prompt processing dropped from 136 ms to 37 ms |
-| Output generation | Both calls generated 51 tokens; generation duration remained about 1.09 s |
+| Model residency | Loading fell from 1.05 s to 2.7 ms, consistent with model reuse |
+| Prompt caching | Cached tokens increased from 0 to 36; prompt processing fell from 136 ms to 37 ms |
+| Output generation | Both calls generated 51 tokens; generation duration stayed near 1.09 s |
 
-Reported total duration roughly halved. The improvement came mainly from reduced loading and prompt processing, not faster output generation.
+Reported total duration roughly halved because loading and prompt processing became cheaper, not because generation became faster.
 
-This is an observation from two calls, not a general performance benchmark. A stronger comparison would repeat each condition several times and report median and tail latency.
+These are observations from two calls, not a general performance benchmark.
+
+## Run 4: Python client with `qwen2.5:7b`
+
+I ran `src/local/day_3_chats.py` twice using `temperature: 0` and explicit `keep_alive`.
+
+This used a different model and different token counts from the curl runs. It is a separate paired comparison, not a controlled model-to-model benchmark.
+
+| Metric | Call 1 | Call 2 |
+|---|---:|---:|
+| Input tokens | 43 | 43 |
+| Output tokens | 71 | 71 |
+| Cached prompt tokens | 0 | 42 |
+| Model-loading duration | 3,563 ms | 2 ms |
+| Prompt-processing duration | 307 ms | 54 ms |
+| Output-generation duration | 3,342 ms | 3,378 ms |
+| Client elapsed time | 7,254 ms | 3,456 ms |
+| Server-reported total | 7,220 ms | 3,438 ms |
+
+### Interpretation
+
+- Answer text matched across both calls in this experiment.
+- Client elapsed time fell by approximately 52%.
+- Model-loading duration fell by 3,561 ms.
+- Prompt-processing duration fell by 253 ms, with 42 of 43 prompt tokens reported as cached.
+- Output generation took 36 ms longer, so faster generation did not explain the overall improvement.
+
+The near-zero loading duration is consistent with model residency. Prompt caching is separate evidence of reused prompt computation.
+
+Client elapsed time exceeded server-reported duration by 34 ms on Call 1 and 18 ms on Call 2. This gap includes overhead outside the server's reported timing; the experiment does not isolate its individual causes.
+
+There was no per-token API charge. Electricity and hardware costs were not measured.
 
 ## Bridge to Bedrock Converse
 
-Bedrock testing remains pending until account access is restored.
+Live Bedrock testing remains pending until account access is restored.
 
 | Concept | Ollama | Bedrock Converse |
 |---|---|---|
@@ -145,59 +171,59 @@ Bedrock testing remains pending until account access is restored.
 | Input tokens | `prompt_eval_count` | `usage.inputTokens` |
 | Output tokens | `eval_count` | `usage.outputTokens` |
 | Reported latency | `total_duration / 1e6` in ms | `metrics.latencyMs` |
-| Usage cost | No per-token API charge; local electricity and hardware costs not measured | Estimate using applicable model prices and usage categories |
+| Usage cost | No per-token API charge; local costs not measured | Estimate using current model prices and applicable usage categories |
 
-The token counts and latency fields are useful counterparts, but their accounting and measurement boundaries are not necessarily identical across providers. Token counts also depend on the model's tokenizer and chat template.
+Tokenizers, token accounting, and timing boundaries can differ across providers. Treat these fields as conceptual counterparts, not guaranteed identical measurements.
 
-For an ordinary uncached, on-demand Bedrock text call, estimate input and output charges separately using the model's current rates. Include any additional applicable charges; do not reuse one model's prices for another.
+For an ordinary uncached, on-demand Bedrock text call, estimate input and output charges separately using the selected model's current rates. Include any additional applicable charges, and do not reuse another model's prices.
 
-Day 3 script deliverable:
+### What does Converse provide over InvokeModel?
 
-- Print the answer and model name.
+Converse provides a consistent conversation interface across supported Bedrock models, including common message structures and inference parameters. InvokeModel generally requires model-specific request and response bodies.
+
+Model capabilities still vary, and some features require model-specific fields even when using Converse.
+
+## Script requirements
+
+The local script should:
+
+- Print the answer and model identifier.
 - Print input and output token counts.
 - Print provider-reported latency in milliseconds.
 - Measure client elapsed time separately.
-- For local execution, state that there is no per-token API charge rather than claiming zero total cost.
-- For Bedrock, print an estimated cost once the model, pricing, and usage are known.
+- Report loading, prompt processing, generation, and cached tokens when available.
+- State that local execution has no per-token API charge, rather than claiming zero total cost.
+
+The later Bedrock version should preserve the common output fields and add an estimated cost once model pricing and usage are known.
 
 ## Takeaways
 
 1. Separate model loading, prompt processing, and output generation; total duration alone hides the dominant phase.
-2. `keep_alive` requests model retention. Prompt caching separately reuses prompt computation; retention does not guarantee a cache hit.
-3. A clear prompt defines the task. Lower temperature reduces sampling variability, but does not guarantee correctness or instruction-following.
-4. API success, task correctness, and performance are separate things to evaluate.
-5. Ollama lets me practise the local model-client workflow while Bedrock is blocked. AWS authentication, Converse-specific handling, and managed-service behaviour still require later AWS practice.
-
-## Tasks
-## Python measurement results
-
-Ran `src/day_03_chat.py` twice with `temperature: 0`.
-
-| Metric | Call 1 | Call 2 |
-|---|---:|---:|
-| Input tokens | 43 | 43 |
-| Output tokens | 71 | 71 |
-| Cached prompt tokens | 0 | 42 |
-| Model load | 3,563 ms | 2 ms |
-| Prompt processing | 307 ms | 54 ms |
-| Output generation | 3,342 ms | 3,378 ms |
-| Client elapsed time | 7,254 ms | 3,456 ms |
-| Server-reported total | 7,220 ms | 3,438 ms |
-
-The answer text matched across both calls. This is an observation from this experiment, not a guarantee from temperature zero.
-
-Call 2's client elapsed time fell by approximately 52%. Model-loading time dropped by 3,561 ms and prompt processing by 253 ms. Output generation was slightly slower, so faster generation did not explain the improvement.
-
-The near-zero second loading duration is consistent with model residency. Separately, 42 of 43 prompt tokens were reported as cached, showing reuse of prompt computation.
-
-Client elapsed time exceeded server-reported duration by 34 ms on Call 1 and 18 ms on Call 2. This gap includes overhead outside the server's reported timing; these measurements do not isolate its individual causes.
-
-There was no per-token API charge. Electricity and hardware costs were not measured.
-
-These Python runs used different token counts from the earlier curl runs, so they are a separate paired comparison, not a direct speed comparison against curl.
+2. `keep_alive` requests model retention. Prompt caching is a separate mechanism and is not guaranteed by retention alone.
+3. Clear prompts define the task. Lower temperature reduces sampling variability, not the need to check correctness.
+4. API success, task correctness, and performance are separate checks.
+5. Two calls illustrate behaviour but are insufficient for a reliable benchmark.
+6. Ollama supports local practice while Bedrock is blocked. AWS authentication and Converse-specific behaviour still require live AWS exercises.
 
 ## Day 3 status
 
-Completed locally: API calls, response inspection, token accounting, provider-reported timing, client elapsed timing, and a two-call comparison using `src/day_03_chat.py`.
+Completed locally:
 
-Pending AWS access: repeat the exercise through Bedrock Converse, verify AWS authentication and response handling, and calculate estimated cost using the selected model's current prices.
+- Curl and Python API calls.
+- Response inspection and token accounting.
+- Provider-reported timings and Python client elapsed timing.
+- Paired observations of loading and prompt caching for both models.
+- Conceptual comparison of Converse and InvokeModel.
+
+Remaining local comparison:
+
+- Run the same prompt on `llama3.2` and `qwen2.5:7b` using the same generation settings.
+- Warm each model before its measured runs and record loading and cache status.
+- Compare answer quality, instruction-following, token counts, and timing.
+- Keep cached and uncached results separate. Different tokenizers and output lengths limit direct speed comparisons.
+
+Pending AWS access:
+
+- Repeat the exercise through Bedrock Converse.
+- Verify AWS authentication and response handling.
+- Estimate cost using the selected model's current prices.
