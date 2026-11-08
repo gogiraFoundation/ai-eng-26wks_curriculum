@@ -13,7 +13,7 @@
         "iam:ChangePassword",
         "iam:GetLoginProfile"
       ],
-      "Resource": "arn:aws:iam::767397880814:user/${aws:username}"
+      "Resource": "arn:aws:iam::__AWS_ACCOUNT_ID__:user/${aws:username}"
     },
     {
       "Sid": "ManageOwnMfa",
@@ -26,8 +26,8 @@
         "iam:ResyncMFADevice"
       ],
       "Resource": [
-        "arn:aws:iam::767397880814:user/${aws:username}",
-        "arn:aws:iam::767397880814:mfa/${aws:username}"
+        "arn:aws:iam::__AWS_ACCOUNT_ID__:user/${aws:username}",
+        "arn:aws:iam::__AWS_ACCOUNT_ID__:mfa/${aws:username}"
       ]
     },
     {

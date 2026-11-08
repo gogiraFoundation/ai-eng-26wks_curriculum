@@ -1,7 +1,10 @@
 #!/bin/bash
 # Create the customer managed policies and attach them to groups.
-# An existing policy gets a new default version. Groups are not created here.
-# Caller must be the account root.
+# Policy JSON may contain __AWS_ACCOUNT_ID__ and __IAM_ROLE_NAME__.
+# Those tokens are filled from .env into a temporary document. The files
+# in the repo are not rewritten. An existing policy gets a new default
+# version. An attachment that is already present is skipped.
+# Groups are not created here. Caller must be the account root.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -9,6 +12,12 @@ ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 ENV_FILE="${ENV_FILE:-$ROOT/.env}"
 POLICY_DIR="${ROOT}/infra/iam-setup/policies"
 SIGN_IN_POLICY="arn:aws:iam::aws:policy/SignInLocalDevelopmentAccess"
+WORK=""
+
+cleanup() {
+  [[ -n "${WORK}" ]] && rm -rf "$WORK"
+}
+trap cleanup EXIT
 
 POLICIES=(
   console-self
@@ -53,6 +62,28 @@ policy_arn() {
   printf 'arn:aws:iam::%s:policy/%s' "$AWS_ACCOUNT_ID" "$1"
 }
 
+# Fill account and role tokens. Leave IAM policy variables such as
+# ${aws:username} untouched. Fail if a token is still present, so a
+# document cannot be uploaded with a literal placeholder.
+render_document() {
+  local src="$1" dest="$2" text
+  text="$(<"$src")"
+  if [[ -n "${AWS_ACCOUNT_ID:-}" ]]; then
+    text="${text//__AWS_ACCOUNT_ID__/${AWS_ACCOUNT_ID}}"
+  fi
+  if [[ -n "${AWS_IAM_USER_ARN:-}" ]]; then
+    text="${text//__AWS_IAM_USER_ARN__/${AWS_IAM_USER_ARN}}"
+  fi
+  if [[ -n "${IAM_ROLE_NAME:-}" ]]; then
+    text="${text//__IAM_ROLE_NAME__/${IAM_ROLE_NAME}}"
+  fi
+  printf '%s\n' "$text" > "$dest"
+  if grep -E -q '__AWS_ACCOUNT_ID__|__AWS_IAM_USER_ARN__|__IAM_ROLE_NAME__' "$dest"; then
+    echo "Error: ${src} still has a placeholder. Set the matching key in ${ENV_FILE}." >&2
+    exit 1
+  fi
+}
+
 put_policy_version() {
   local arn="$1" file="$2" out status old
   set +e
@@ -80,38 +111,62 @@ put_policy_version() {
 }
 
 create_or_update() {
-  local name="$1" file arn
-  file="${POLICY_DIR}/${name}.json"
+  local name="$1" src rendered arn
+  src="${POLICY_DIR}/${name}.json"
+  rendered="${WORK}/${name}.json"
   arn="$(policy_arn "$name")"
-  if [[ ! -f "$file" ]]; then
-    echo "Error: missing ${file}." >&2
+  if [[ ! -f "$src" ]]; then
+    echo "Error: missing ${src}." >&2
     exit 1
   fi
+  render_document "$src" "$rendered"
   if aws iam get-policy --policy-arn "$arn" >/dev/null 2>&1; then
-    put_policy_version "$arn" "$file"
+    put_policy_version "$arn" "$rendered"
     echo "updated: ${name}"
     return
   fi
   aws iam create-policy \
     --policy-name "$name" \
-    --policy-document "file://${file}" >/dev/null
+    --policy-document "file://${rendered}" >/dev/null
   echo "created: ${name}"
 }
 
+# AttachGroupPolicy is not idempotent. A second attach returns an error
+# (often LimitExceeded) and set -e would stop the script. Skip when the
+# ARN is already on the group.
 attach_group() {
-  local group="$1" policy="$2" arn
+  local group="$1" policy="$2" arn found
   if [[ "$policy" == arn:* ]]; then
     arn="$policy"
   else
     arn="$(policy_arn "$policy")"
+  fi
+  found="$(aws iam list-attached-group-policies \
+    --group-name "$group" \
+    --query "AttachedPolicies[?PolicyArn=='${arn}'].PolicyArn | [0]" \
+    --output text)"
+  if [[ "$found" == "$arn" ]]; then
+    echo "exists: ${group} ${policy}"
+    return 0
   fi
   aws iam attach-group-policy --group-name "$group" --policy-arn "$arn"
   echo "attached: ${group} ${policy}"
 }
 
 AWS_ACCOUNT_ID="$(env_get AWS_ACCOUNT_ID)"
+IAM_ROLE_NAME="$(env_get IAM_ROLE_NAME)"
 AWS_PROFILE="$(env_optional AWS_PROFILE || true)"
 [[ -n "${AWS_PROFILE}" ]] && export AWS_PROFILE
+
+if [[ ! "$AWS_ACCOUNT_ID" =~ ^[0-9]{12}$ ]]; then
+  echo "Error: AWS_ACCOUNT_ID must be 12 digits." >&2
+  exit 1
+fi
+
+if [[ -z "$IAM_ROLE_NAME" || ! "$IAM_ROLE_NAME" =~ ^[A-Za-z0-9+=,.@_-]+$ ]]; then
+  echo "Error: IAM_ROLE_NAME is empty or has characters that cannot go in a policy ARN." >&2
+  exit 1
+fi
 
 read -r CALLER_ACCOUNT CALLER_ARN <<<"$(aws sts get-caller-identity --query '[Account,Arn]' --output text)"
 
@@ -124,6 +179,8 @@ if [[ "$CALLER_ARN" != *:root ]]; then
   echo "Error: policy changes must run as root. Caller is ${CALLER_ARN}." >&2
   exit 1
 fi
+
+WORK="$(mktemp -d)"
 
 for name in "${POLICIES[@]}"; do
   create_or_update "$name"

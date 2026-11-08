@@ -50,17 +50,17 @@ The scripts read these keys from `.env`. They do not `source` the file.
 
 | Key | Used for |
 |-----|----------|
-| `AWS_ACCOUNT_ID` | Account check and policy ARNs |
+| `AWS_ACCOUNT_ID` | Account check, policy ARNs, and `__AWS_ACCOUNT_ID__` in policy documents |
 | `AWS_PROFILE` | CLI profile. Must be a root session for apply |
-| `AWS_IAM_USER_ARN` | User placed in `IAM_USER_GROUP` |
+| `AWS_IAM_USER_ARN` | User placed in `IAM_USER_GROUP`, and `__AWS_IAM_USER_ARN__` in the trust policy |
 | `IAM_GROUP_NAMES` | `research_and_development\|admins\|shared_resource_manager\|user_clients` |
-| `IAM_ROLE_NAME` | `llm-cli` |
+| `IAM_ROLE_NAME` | `llm-cli`, and `__IAM_ROLE_NAME__` in `assume-llm-cli.json` |
 | `IAM_ROLE_POLICIES` | `bedrock-invoke-nova\|bedrock-require-inference-profile\|bedrock-deny-expensive` |
 | `IAM_USER_GROUP` | `research_and_development` |
 | `AWS_BUDGETS_REGION` | `us-east-1` |
 | `BUDGET_NAMES` | `MonthlyCostBudget\|My Zero-Spend Budget` |
 
-`roles/llm-cli-trust.json` still names the account and `afrotyche@gmail.com` in the file. Keep it aligned with `AWS_ACCOUNT_ID` and `AWS_IAM_USER_ARN`. The script does not rewrite that JSON from `.env`.
+`policies/console-self.json`, `policies/assume-llm-cli.json`, `policies/bedrock-invoke-nova.json`, and `roles/llm-cli-trust.json` use `__AWS_ACCOUNT_ID__`, `__AWS_IAM_USER_ARN__`, and `__IAM_ROLE_NAME__`. `iam-security.sh` and `iam-roles.sh` substitute those tokens from `.env` into a temporary document before each upload. The files in the repo are not rewritten.
 
 ## Apply (root only)
 
@@ -79,7 +79,7 @@ From the repo root:
 bash infra/run-setup.sh
 ```
 
-A failed script stops the runner. A second run is safe: existing groups and the role are left in place, policy documents are published as a new default version, and the user stays in `research_and_development`. `iam-assign-users.sh` also removes that user from every other group and deletes managed and inline policies attached to the user.
+A failed script stops the runner. A second run is safe: existing groups and the role are left in place, policy documents are rendered from `.env` and published as a new default version, and attachments that are already present are skipped. `AttachGroupPolicy` and `AttachRolePolicy` are not idempotent, so the scripts check the attachment list first. The user stays in `research_and_development`. `iam-assign-users.sh` also removes that user from every other group and deletes managed and inline policies attached to the user.
 
 After apply, sign in again as the IAM user on the same profile. Do not leave root on `agent-toolkit`.
 

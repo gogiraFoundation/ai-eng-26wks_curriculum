@@ -5,12 +5,12 @@
       "Sid": "ResearchUserMayAssume",
       "Effect": "Allow",
       "Principal": {
-        "AWS": "arn:aws:iam::767397880814:root"
+        "AWS": "arn:aws:iam::__AWS_ACCOUNT_ID__:root"
       },
       "Action": "sts:AssumeRole",
       "Condition": {
         "ArnLike": {
-          "aws:PrincipalArn": "arn:aws:iam::767397880814:user/afrotyche@gmail.com"
+          "aws:PrincipalArn": "__AWS_IAM_USER_ARN__"
         }
       }
     }

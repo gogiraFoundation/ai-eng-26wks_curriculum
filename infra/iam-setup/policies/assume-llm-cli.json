@@ -5,7 +5,7 @@
       "Sid": "AssumeLlmCliRole",
       "Effect": "Allow",
       "Action": "sts:AssumeRole",
-      "Resource": "arn:aws:iam::767397880814:role/llm-cli"
+      "Resource": "arn:aws:iam::__AWS_ACCOUNT_ID__:role/__IAM_ROLE_NAME__"
     }
   ]
 }

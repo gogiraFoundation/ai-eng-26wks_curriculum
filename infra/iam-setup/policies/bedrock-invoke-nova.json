@@ -9,8 +9,8 @@
         "bedrock:InvokeModelWithResponseStream"
       ],
       "Resource": [
-        "arn:aws:bedrock:eu-north-1:767397880814:inference-profile/eu.amazon.nova-micro-v1:0",
-        "arn:aws:bedrock:eu-north-1:767397880814:inference-profile/eu.amazon.nova-lite-v1:0",
+        "arn:aws:bedrock:eu-north-1:__AWS_ACCOUNT_ID__:inference-profile/eu.amazon.nova-micro-v1:0",
+        "arn:aws:bedrock:eu-north-1:__AWS_ACCOUNT_ID__:inference-profile/eu.amazon.nova-lite-v1:0",
         "arn:aws:bedrock:*::foundation-model/amazon.nova-micro-v1:0",
         "arn:aws:bedrock:*::foundation-model/amazon.nova-lite-v1:0"
       ]
