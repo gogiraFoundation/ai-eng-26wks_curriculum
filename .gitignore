@@ -1,3 +1,9 @@
 .env
-# Credential placeholders (password, access key, secret key) stay local.
+.env.*
+!.env.example
+
+# Local credential files. Do not list secret values here.
 config.json
+*.pem
+credentials
+credentials.json
