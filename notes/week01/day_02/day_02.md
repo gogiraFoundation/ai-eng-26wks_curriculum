@@ -8,6 +8,21 @@ AWS Identity and Access Management (IAM) is a web service for securely controlli
 
 Use **AWS Budgets** to set spending thresholds and get notifications when actual or forecast spend crosses them (for example at 50%, 80% and 100% of a monthly limit).
 
+Live budgets on the primary billing view (1 Nov 2026). Both are healthy. A dash means AWS has not produced that figure yet; a new account with no spend often has no forecast.
+
+| Name | Limit (USD) | Amount used | Forecast | Current vs budgeted | Health |
+|---|---:|---:|---:|---:|---|
+| MonthlyCostBudget | 50.00 | 0.00 | - | 0.00% | Healthy |
+| My Zero-Spend Budget | 1.00 | - | - | 0.00% | Healthy |
+
+`MonthlyCostBudget` is the monthly cap. `My Zero-Spend Budget` is the early warning: it trips near the first dollar of spend.
+
+## Region
+
+Project Region: `eu-north-1` (Stockholm). The `agent-toolkit` CLI profile already uses it.
+
+The console list is the default Regions. They are enabled automatically and cannot be turned off. Stockholm is on that list. The line "17 Regions that are not enabled" refers to opt-in Regions launched after 20 March 2019. Leave those disabled. Create resources only in `eu-north-1`.
+
 ## Security best practices _(added, please review)_
 
 - Turn on MFA for the root user, and don't use root for daily work.
@@ -43,9 +58,9 @@ A Bedrock policy can also act as a company-wide guardrail across multiple accoun
 
 ## Day 2 task checklist
 
-- [ ] Budget alarm created
+- [x] Budget alarm created (`MonthlyCostBudget` at $50, `My Zero-Spend Budget` at $1; both healthy, $0 spend)
 - [ ] MFA enabled and Identity Center user created
 - [ ] SSO profile named (check it matches the `agent-toolkit` profile or note the new name)
-- [ ] `infra/iam-bedrock-policy.json` committed
+- [ ] `infra/iam-setup/` policies committed
 - [ ] `notes/aws-setup.md` checklist committed (budgets, MFA, SSO profile name, no screenshots)
 - [ ] No keys committed

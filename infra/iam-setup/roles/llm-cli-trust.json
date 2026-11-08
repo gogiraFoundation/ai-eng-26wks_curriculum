@@ -1,0 +1,18 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ResearchUserMayAssume",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::767397880814:root"
+      },
+      "Action": "sts:AssumeRole",
+      "Condition": {
+        "ArnLike": {
+          "aws:PrincipalArn": "arn:aws:iam::767397880814:user/afrotyche@gmail.com"
+        }
+      }
+    }
+  ]
+}

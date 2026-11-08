@@ -1,0 +1,30 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyOpus",
+      "Effect": "Deny",
+      "Action": [
+        "bedrock:InvokeModel",
+        "bedrock:InvokeModelWithResponseStream",
+        "bedrock:CreateModelInvocationJob"
+      ],
+      "Resource": [
+        "arn:aws:bedrock:*:*:inference-profile/*claude-opus*",
+        "arn:aws:bedrock:*::foundation-model/anthropic.claude-opus*"
+      ]
+    },
+    {
+      "Sid": "DenyProvisionedThroughput",
+      "Effect": "Deny",
+      "Action": [
+        "bedrock:InvokeModel",
+        "bedrock:InvokeModelWithResponseStream",
+        "bedrock:CreateProvisionedModelThroughput",
+        "bedrock:UpdateProvisionedModelThroughput",
+        "bedrock:DeleteProvisionedModelThroughput"
+      ],
+      "Resource": "arn:aws:bedrock:*:*:provisioned-model/*"
+    }
+  ]
+}

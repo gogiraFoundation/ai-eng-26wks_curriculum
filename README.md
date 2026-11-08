@@ -18,7 +18,7 @@ The plan below is the syllabus. Checked in so far:
 | `README.md` | This 26-week plan |
 | `infra/readme.md` | AWS account and CLI setup for `eu-north-1` |
 | `infra/aws_setup.md` | Setup checklist |
-| `infra/iam-setup/iam-bedrock-policy.json` | Bedrock IAM policy |
+| `infra/iam-setup/` | Least-privilege IAM group and role policies |
 | `notes/week01/week01.md` | Week 1 schedule |
 | `notes/week01/day_01/`, `notes/week01/day_02/` | Day notes |
 

@@ -8,7 +8,7 @@
 | Day | Date | Topic | Task |
 |---|---|---|---|
 | 1 | Mon 26 Oct | How LLMs work: tokens, next-token prediction, context windows | Create repo `ai-eng-26wk` with `/notes/week01.md`. Record 3 surprising tokenisation results (code, numbers, non-English). |
-| 2 | Tue 27 Oct | AWS account hygiene: budget alarm, Identity Center user, least privilege | Commit `infra/iam-bedrock-policy.json` and a screenshot-free checklist in `notes/aws-setup.md` (budgets, MFA, SSO profile name). Never commit keys. |
+| 2 | Tue 27 Oct | AWS account hygiene: budget alarm, Identity Center user, least privilege | Commit `infra/iam-setup/` (least-privilege policies) and a screenshot-free checklist in `notes/aws-setup.md` (budgets, MFA, SSO profile name). Never commit keys. |
 | 3 | Wed 28 Oct | First Bedrock call with the Converse API | `src/bedrock_chat.py` prints the answer, input/output tokens, latency (ms) and estimated cost per call. |
 | 4 | Thu 29 Oct | Sampling: temperature, top-p, max tokens, streaming | Add `--temperature` and `--stream` flags. Save a short table of output variance per temperature in the notes. |
 | 5 | Fri 30 Oct | Rest day | |
@@ -55,7 +55,7 @@ Each model uses its own tokenizer, and each tokenizer splits text into different
 ## Week 1 checklist
 
 - [ ] Repo `ai-eng-26wk` created
-- [ ] AWS billing alarm and budget set
+- [x] AWS billing alarm and budget set (`MonthlyCostBudget` $50, `My Zero-Spend Budget` $1)
 - [ ] MFA on, SSO profile named, no keys committed
 - [ ] `src/bedrock_chat.py` prints tokens, latency and cost
 - [ ] `--temperature` and `--stream` flags added, variance table saved

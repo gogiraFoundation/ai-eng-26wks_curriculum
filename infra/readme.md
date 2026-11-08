@@ -2,7 +2,7 @@
 
 Infrastructure and environment setup for the AI Engineer learning projects (AWS track, MLA-C02 and LLM engineering).
 
-**Owner:** gogirafoundation@gmail.com
+**Owner:** station-chief
 **Cloud:** AWS
 **Region:** `eu-north-1` (Stockholm)
 **AWS CLI profile:** `agent-toolkit`
@@ -12,8 +12,10 @@ Infrastructure and environment setup for the AI Engineer learning projects (AWS 
 | Path | Role |
 |------|------|
 | `readme.md` | This setup guide |
-| `aws_setup.md` | Account checklist (budgets, MFA, profile). Do not commit keys |
-| `iam-setup/iam-bedrock-policy.json` | IAM policy document for Bedrock |
+| `aws_setup.md` | Account checklist (budgets, MFA, profile). No keys |
+| `run-setup.sh` | Apply IAM, then read the two budgets |
+| `session-resources.sh` | List hourly resources in `eu-north-1`. Tear down only when asked |
+| `iam-setup/` | Least-privilege groups, policies, and role `llm-cli` |
 
 ---
 
@@ -23,10 +25,10 @@ Infrastructure and environment setup for the AI Engineer learning projects (AWS 
 |---|---|---|
 | Cloud provider | AWS | New AWS experience (project-based account) |
 | Default Region | `eu-north-1` | All Regional resources must be created here |
-| Global exceptions | `us-east-1` | Only for CloudFront, WAF and CloudWatch Logs tied to global resources |
+| Global exceptions | `us-east-1` | CloudFront, WAF, and CloudWatch Logs tied to global resources. Also the Budgets API (`AWS_BUDGETS_REGION`) and Agent Toolkit |
 | Auth | `aws login` (browser sign-in) | Credentials last 12 hours, renewable for 90 days |
 | AI tooling | Agent Toolkit for AWS | Skills + AWS MCP server, configured for Cursor |
-| IaC | _TODO: CDK or Terraform_ | Pick one per project and keep it consistent |
+| IaC | _TODO: CDK or Terraform_ | Not checked in yet |
 | CI/CD | _TODO: GitHub Actions_ | |
 
 Constraints of the new AWS experience:
@@ -70,13 +72,26 @@ aws sts get-caller-identity --profile agent-toolkit
 
 Expected: an `Account` and `Arn` are returned.
 
-> **Security note:** the current login uses the root user. For everyday work, create a limited user or role (least privilege) and switch the profile to it. Never create long-lived access keys. Prefer IAM Identity Center and GitHub OIDC for CI.
+Root on `agent-toolkit` is only for `run-setup.sh`, `iam-destroy-resource.sh destroy`, and `session-resources.sh teardown`. Daily work is the IAM user `afrotyche@gmail.com`. Sign the profile back in as that user when the root command finishes. Do not create long-lived access keys. IAM Identity Center is not set up yet.
 
-### 3.3 Billing protection (do this first)
+### 3.3 Billing protection
 
-- Create a billing alarm or budget in the Billing and Cost Management console.
-- Set a spend limit in AWS Settings, Billing.
-- Tear down hourly-billed resources after every session (SageMaker endpoints, OpenSearch, NAT gateways, RDS).
+`MonthlyCostBudget` (50 USD) and `My Zero-Spend Budget` (1 USD) already exist. `iam-budgets.sh` reads them in `us-east-1`. It does not create them. Set a spend limit in AWS Settings, Billing. Status of MFA and Identity Center: `aws_setup.md`.
+
+At the end of a session, from the repo root:
+
+```bash
+bash infra/session-resources.sh
+bash infra/session-resources.sh teardown
+```
+
+`teardown` deletes SageMaker endpoints, NAT gateways, and load balancers, and it stops notebooks and RDS. OpenSearch domains stay until you pass one quoted argument, because that deletes the index:
+
+```bash
+bash infra/session-resources.sh "teardown data"
+```
+
+Unattached volumes are listed and kept.
 
 ---
 
@@ -122,36 +137,43 @@ aws agent-toolkit list-available-skills --region us-east-1 --profile agent-toolk
 
 ## 5. Repository layout
 
-_Adjust to match your repo._
+Checked in today:
 
 ```text
 .
 ├── README.md
+├── .env.example
 ├── infra/
-│   ├── README.md          # this file
-│   ├── cdk/ or terraform/ # infrastructure as code
-│   └── scripts/           # setup and teardown helpers
-├── notes/
-│   └── day-01-tokens.md
-├── projects/
-│   ├── 01-rag-service/
-│   ├── 02-tool-agent/
-│   └── 03-finetune-vs-api/
-└── .github/workflows/     # CI
+│   ├── readme.md
+│   ├── aws_setup.md
+│   ├── run-setup.sh
+│   ├── session-resources.sh
+│   └── iam-setup/
+│       ├── README.md
+│       ├── policies/
+│       ├── roles/llm-cli-trust.json
+│       └── scripts/
+└── notes/week01/
 ```
+
+CDK, `projects/`, and `.github/workflows/` are not in the tree yet.
 
 ---
 
 ## 6. Environments and configuration
 
-| Variable | Purpose | Example |
-|---|---|---|
-| `AWS_PROFILE` | CLI profile to use | `agent-toolkit` |
-| `AWS_REGION` | Default Region | `eu-north-1` |
-| `BEDROCK_MODEL_ID` | Model used by the app | _TODO_ |
+Scripts read `.env` with a line parser. They do not `source` it. Never commit `.env`.
 
-- Never commit secrets. Use `.env` (git-ignored) locally and AWS Secrets Manager or SSM Parameter Store in AWS.
-- Keep a `.env.example` listing every variable with no real values.
+| Key | Purpose |
+|---|---|
+| `AWS_PROFILE` | CLI profile. Root for apply and teardown, IAM user for daily work |
+| `REGION` | Project Region, `eu-north-1` |
+| `AWS_ACCOUNT_ID` | Account check |
+| `AWS_IAM_USER_ARN` | Daily IAM user |
+| `AWS_BUDGETS_REGION` | `us-east-1` |
+| `BUDGET_NAMES` | `MonthlyCostBudget` and `My Zero-Spend Budget` |
+
+Group, role, and policy keys are in `iam-setup/README.md`. `.env.example` does not list those keys yet. `USER_NAME` and `USER_ROLE` are not IAM names. The scripts ignore them.
 
 ---
 
@@ -172,35 +194,43 @@ Availability for each service in `eu-north-1` must be checked before you build o
 
 ## 8. Deploy
 
+No CDK or Terraform project is checked in. IAM apply, as root:
+
 ```bash
-# example, replace with the real commands for your IaC tool
-cd infra/cdk
-npx cdk bootstrap aws://<ACCOUNT_ID>/eu-north-1 --profile agent-toolkit
-npx cdk diff   --profile agent-toolkit
-npx cdk deploy --profile agent-toolkit
+bash infra/run-setup.sh
 ```
+
+The Arn from `aws sts get-caller-identity` must end in `:root`. See `iam-setup/README.md`.
 
 ## 9. Teardown
 
+Hourly resources, from the repo root. The second command needs root:
+
 ```bash
-npx cdk destroy --profile agent-toolkit
-aws sagemaker list-endpoints --region eu-north-1 --profile agent-toolkit
+bash infra/session-resources.sh
+bash infra/session-resources.sh teardown
 ```
 
-After each session confirm nothing is still billing: endpoints, OpenSearch domains, NAT gateways, load balancers, unattached volumes.
+Exit code 2 on the first command means something is still listed. IAM undo, which does not stop an hourly bill:
+
+```bash
+bash infra/iam-setup/scripts/iam-destroy-resource.sh destroy
+```
 
 ---
 
 ## 10. Security checklist
 
 - [ ] MFA on the root user, and root not used for daily work
-- [ ] Least-privilege IAM roles; no long-lived access keys
+- [ ] Least-privilege policies applied with `run-setup.sh` (groups and role `llm-cli`, not policies on the IAM user)
+- [ ] No long-lived access keys. Remove `AWS_BEARER_TOKEN_BEDROCK` from `.env`
 - [ ] GitHub Actions authenticates via OIDC
 - [ ] Buckets private, encryption on (S3, EBS, RDS)
 - [ ] KMS keys for sensitive data
 - [ ] Bedrock Guardrails and PII handling for user-facing apps
 - [ ] CloudTrail enabled
-- [ ] Budget alarm and spend limit set
+- [x] Budget alarm set (`MonthlyCostBudget`, `My Zero-Spend Budget`)
+- [ ] Spend limit set in AWS Settings
 
 ---
 
@@ -213,6 +243,7 @@ After each session confirm nothing is still billing: endpoints, OpenSearch domai
 | `AccessDenied` that used to work | Check spend limit and plan in AWS Settings |
 | Service not available | Run `aws freetier get-account-plan-state` and check the supported services list |
 | `aws: command not found` | Add `$HOME/.local/bin` to `PATH` |
+| `run-setup.sh` stops on the first script | The Arn is not root. Sign in as root, then sign back in as the IAM user |
 
 ---
 
