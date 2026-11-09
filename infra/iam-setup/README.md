@@ -46,7 +46,7 @@ AWS managed policy (attach by name, do not copy into this repo): `SignInLocalDev
 
 ## Environment
 
-The scripts read these keys from `.env`. They do not `source` the file.
+The scripts read these keys from `.env`. They do not `source` the file. `.env.example` lists the same keys.
 
 | Key | Used for |
 |-----|----------|
