@@ -60,3 +60,32 @@ Streaming improves time-to-first-token in the UI. Total generation work is simil
 
 ```text
 Write a single sentence describing a mysterious old key found in an attic, using highly poetic imagery.
+
+
+### Command Shape
+
+        python src/llm_client.py --temperature 0 --stream
+        python src/llm_client.py --temperature 0.5
+        python src/llm_client.py --temperature 1.0  
+
+### Results
+
+
+
+### Observation
+
+        Expected pattern to check for:
+
+            At 0.0, runs should be identical or nearly identical.
+            At 1.0, wording and imagery should diverge more.
+            Streaming should change how text appears, not the sampling math, if temperature and seed-related settings match.
+
+
+### Status
+            src/llm_client.py with --temperature and --stream
+            Variance table filled
+            Observation written
+            Later: same flags on Bedrock Converse when Error 002 clears
+
+
+
