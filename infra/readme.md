@@ -173,7 +173,7 @@ Scripts read `.env` with a line parser. They do not `source` it. Never commit `.
 | `AWS_BUDGETS_REGION` | `us-east-1` |
 | `BUDGET_NAMES` | `MonthlyCostBudget` and `My Zero-Spend Budget` |
 
-Group, role, and policy keys are in `iam-setup/README.md`. `.env.example` does not list those keys yet. `USER_NAME` and `USER_ROLE` are not IAM names. The scripts ignore them.
+Group, role, and policy keys are in `iam-setup/README.md` and `.env.example`. `USER_NAME` and `USER_ROLE` are not IAM names. The scripts ignore them.
 
 ---
 
