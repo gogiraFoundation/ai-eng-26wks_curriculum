@@ -68,7 +68,22 @@ Write a single sentence describing a mysterious old key found in an attic, using
         python src/llm_client.py --temperature 0.5
         python src/llm_client.py --temperature 1.0  
 
-### Results
+## Results
+
+    Constants: model `qwen2.5:7b`, poetic key prompt, `top_p=0.9`, `max_tokens=200`, `keep_alive=10m`.
+
+        | Temp | Run | Stream | First line (trimmed) | Out tok | Load ms | Client ms | Notes |
+        |---:|---:|:---:|---|---:|---:|---:|---|
+        | 0.0 | 1 | no | key hung like a ghostly leaf… | 37 | 3831 | 6057 | cold load; cache 0 |
+        | 0.0 | 2 | no | key hung like a ghostly leaf… | 37 | 1 | 1719 | identical text |
+        | 0.0 | 3 | no | key hung like a ghostly leaf… | 37 | 2 | 1792 | identical text |
+        | 0.5 | 1 | no | weathered key dangled like a ghostly finger… | 40 | 4 | 1883 | wording shifted |
+        | 1.0 | 1 | no | key dangles limply… metal tongue… velvet hands… | 39 | 2 | 1824 | more ornate |
+        | 1.0 | 2 | yes | gnarled key… ghostly hand… doors long closed… | 44 | 2 | 2114 | different again; stream OK |
+
+## Observation
+
+At temperature 0, three successive calls produced the same sentence and token count, which matches greedy / near-deterministic decoding. At 0.5 and 1.0 the imagery diverged (leaf → finger → metal tongue / velvet → gnarled hand) while staying on the attic-key brief. Streaming at temperature 1.0 only changed delivery; it still sampled a new variant. Call 1’s long wall time was load (`3831` ms), not temperature: later warm runs sat near `1.7`–`2.1` s client elapsed with `load_ms` ≈ 1–4.
 
 
 
