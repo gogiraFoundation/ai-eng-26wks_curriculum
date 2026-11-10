@@ -86,8 +86,10 @@ python src/local/llm_client.py --temperature 3.0
 
     At temperature 0, three successive calls matched text and output token count. Raising temperature moved imagery (leaf → finger → metal tongue / gnarled hand) while staying on the attic-key brief until about 1.0. Beyond that, “more creative” sampling produced language mixing and typos, so product-facing copy should stay low-to-mid temperature. Separate load, prompt eval, and generation when reading wall clocks. Streaming is orthogonal to sampling.
 
-    
 
 
 
+### Resource
 
+IBM Guide on LLM Temperature
+LLM Temperature Settings: A Complete Guide for Developers on Tetrate
