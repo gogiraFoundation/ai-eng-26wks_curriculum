@@ -21,7 +21,6 @@ def build_parser() -> argparse.ArgumentParser:
     chat = sub.add_parser("chat", help="Interactive chat")
     chat.add_argument("--provider", choices=("direct", "bedrock"), default=DEFAULT_PROVIDER)
     chat.add_argument("--model", default=None)
-    chat.add_argument("--stream", action="store_true", default=True)
     chat.add_argument("--temperature", type=float, default=DEFAULT_TEMPERATURE)
     chat.add_argument("--top-p", type=float, default=DEFAULT_TOP_P)
     chat.add_argument("--max-tokens", type=int, default=DEFAULT_MAX_TOKENS)
@@ -32,7 +31,7 @@ def run_chat(args: argparse.Namespace) -> int:
     provider = get_provider(args.provider, args.model)
     session = Session()
     print("llm-cli v0.1  |  /clear  /exit")
-    print(f"provider={args.provider}  stream={args.stream}")
+    print(f"provider={args.provider}  stream=always")
 
     while True:
         try:
