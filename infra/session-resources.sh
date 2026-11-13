@@ -47,6 +47,8 @@ AWS_ACCOUNT_ID="$(env_get AWS_ACCOUNT_ID)"
 REGION="$(env_get REGION)"
 AWS_PROFILE="$(env_optional AWS_PROFILE || true)"
 [[ -n "${AWS_PROFILE}" ]] && export AWS_PROFILE
+export AWS_REGION="$REGION"
+export AWS_DEFAULT_REGION="$REGION"
 
 read -r CALLER_ACCOUNT CALLER_ARN <<<"$(aws sts get-caller-identity --query '[Account,Arn]' --output text)"
 if [[ "$CALLER_ACCOUNT" != "$AWS_ACCOUNT_ID" ]]; then

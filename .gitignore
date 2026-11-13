@@ -7,3 +7,8 @@ config.json
 *.pem
 credentials
 credentials.json
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/

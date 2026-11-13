@@ -14,6 +14,13 @@ from llm_cli.config import (
 from llm_cli.providers.base import TurnResult
 
 
+def _reported_count(value: object, fallback: int) -> int:
+    """Keep a reported token count of zero. Estimate only when the field is absent."""
+    if value is None:
+        return fallback
+    return int(value)
+
+
 class OllamaProvider:
     def __init__(
         self,
@@ -68,8 +75,14 @@ class OllamaProvider:
                     break
 
         latency_ms = (time.perf_counter() - started) * 1000
-        in_tok = int(final.get("prompt_eval_count") or max(1, len(str(messages)) // 4))
-        out_tok = int(final.get("eval_count") or max(1, len(text) // 4))
+        in_tok = _reported_count(
+            final.get("prompt_eval_count"),
+            max(1, len(str(messages)) // 4),
+        )
+        out_tok = _reported_count(
+            final.get("eval_count"),
+            max(1, len(text) // 4),
+        )
         self._last = TurnResult(
             text=text,
             input_tokens=in_tok,

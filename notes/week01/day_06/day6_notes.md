@@ -3,7 +3,7 @@
 **Deliverable:** `llm-cli chat --provider bedrock|direct` with streaming and a running token/cost total  
 **Lab log:** [day6.md](./day6.md)  
 **Package:** `src/llm_cli/`  
-**Context:** Bedrock Converse may still return `Error 002`. Prove `direct` (Ollama) end-to-end; keep Bedrock wired for when the account unblocks.
+**Status:** Both providers proven live. Bedrock uses IAM user `afrotyche@gmail.com` on profile `agent-toolkit` (former `Error 002` cleared).
 
 ## Goal
 
@@ -14,7 +14,7 @@ One interactive chat loop that:
 3. Keeps running input/output token totals and a cost estimate across turns
 4. Prints a per-turn footer and a session total on exit (`/exit` or Ctrl+C)
 
-Reuse Day 3–4 ideas (answer, tokens, latency, `temperature` / `stream`) behind a thin provider interface. Do not paste Day 4 temperature tables here.
+Reuse Day 3–4 ideas (answer, tokens, latency, `temperature`) behind a thin provider interface. Do not paste Day 4 temperature tables here.
 
 ## The streaming accounting problem
 
@@ -54,6 +54,8 @@ last_result -> TurnResult(text, input_tokens, output_tokens, latency_ms, cost_us
 
 Ollama native chat is NDJSON, not OpenAI `data: …` SSE (unless you call `/v1/chat/completions`).
 
+The CLI always streams. Do not advertise a no-op `--stream` flag unless it actually toggles behaviour.
+
 ## Running session totals
 
 After each turn:
@@ -80,7 +82,7 @@ Printed format:
 | `direct` | `cost_usd: 0` (local) |
 | `bedrock` | `(in/1000)*BEDROCK_INPUT_USD_PER_1K + (out/1000)*BEDROCK_OUTPUT_USD_PER_1K` in `config.py`; document rates and date |
 
-## Layout (as shipped)
+## Layout
 
 ```text
 src/llm_cli/
@@ -99,14 +101,22 @@ src/llm_cli/
 
 ## How to run
 
-From repo root, with Ollama serving `qwen2.5:7b`:
+From repo root. Prefer `.venv/bin/python` so `botocore[crt]` (needed for `aws login` credentials) is found.
 
 ```bash
-# PYTHONPATH so src/llm_cli is importable without install
-PYTHONPATH=src python -m llm_cli chat --provider direct --stream
+# direct: Ollama must be serving qwen2.5:7b
+PYTHONPATH=src .venv/bin/python -m llm_cli chat --provider direct
 
-# when Bedrock works
-PYTHONPATH=src python -m llm_cli chat --provider bedrock --stream
+# bedrock: IAM user on agent-toolkit; no Bedrock bearer token in the environment
+unset AWS_BEARER_TOKEN_BEDROCK
+aws sts get-caller-identity --profile agent-toolkit
+PYTHONPATH=src .venv/bin/python -m llm_cli chat --provider bedrock
+```
+
+If you see `MissingDependencyException` for the login credential provider:
+
+```bash
+.venv/bin/python -m pip install 'botocore[crt]'
 ```
 
 In-chat: `/clear` (reset history + totals), `/exit` (print session total and quit). Shell `CLEAR` is unrelated.
@@ -115,15 +125,16 @@ In-chat: `/clear` (reset history + totals), `/exit` (print session total and qui
 
 ## Behaviour notes from the lab
 
-- Multi-turn context works: turn `in` rises as history grows.
+- Multi-turn context works on both providers: turn `in` rises as history grows.
 - `out=200` means `num_predict` / max tokens hit the default cap; raise with `--max-tokens`.
-- Weak system prompt (`You are a concise CLI assistant.`) plus a small local model can invent identity (e.g. claiming Anthropic). Optional tighten: name the real model (`qwen2.5:7b` via Ollama) and forbid inventing vendor/stack.
-- Prefer `.venv/bin/python` after activate; earlier failures showed `/usr/local/bin/python3` missing the package on `PYTHONPATH`.
+- Weak system prompt (`You are a concise CLI assistant.`) plus a small local model can invent identity (e.g. claiming Anthropic). Bedrock replies as an Amazon model. Optional: name the real model in the system prompt.
+- Bedrock smoke (recorded in [day6.md](./day6.md)): session `in=121 out=107 cost_usd=0.000019` over two turns.
+- IAM least-privilege apply (`infra/run-setup.sh`) is separate from this CLI lab, but daily Bedrock calls should use the IAM user in `research_and_development`, not root.
 
 ## Status
 
 - [x] Provider interface + Ollama `direct` stream + usage from final NDJSON
 - [x] Running session token/cost totals + `/clear` / `/exit`
 - [x] Multi-turn chat loop (`python -m llm_cli` via `__main__.py`)
-- [ ] Bedrock provider proven live (may still fail with `Error 002`)
+- [x] Bedrock provider proven live (`converse_stream`, IAM user + CRT)
 - [x] Lab results recorded in [day6.md](./day6.md)

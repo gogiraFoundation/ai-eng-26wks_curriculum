@@ -56,10 +56,9 @@ if [[ "$CALLER_ARN" != *:root ]]; then
   echo "Error: create-group must run as root. Caller is ${CALLER_ARN}." >&2
   exit 1
 fi
+IFS='|' read -r -a GROUP_LIST <<<"$IAM_GROUP_NAMES" || true
 
-IFS='|' read -r -a GROUPS <<<"$IAM_GROUP_NAMES"
-
-for name in "${GROUPS[@]}"; do
+for name in "${GROUP_LIST[@]}"; do
   if aws iam get-group --group-name "$name" >/dev/null 2>&1; then
     echo "exists: ${name}"
     continue
