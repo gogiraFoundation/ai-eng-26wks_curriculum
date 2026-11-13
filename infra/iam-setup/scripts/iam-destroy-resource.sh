@@ -83,8 +83,8 @@ AWS_PROFILE="$(env_optional AWS_PROFILE || true)"
 [[ -n "${AWS_PROFILE}" ]] && export AWS_PROFILE
 
 IAM_USER="${AWS_IAM_USER_ARN##*/}"
-IFS='|' read -r -a GROUPS <<<"$IAM_GROUP_NAMES"
-IFS='|' read -r -a ROLE_POLICIES <<<"$IAM_ROLE_POLICIES"
+IFS='|' read -r -a GROUP_LIST <<<"$IAM_GROUP_NAMES" || true
+IFS='|' read -r -a ROLE_POLICIES <<<"$IAM_ROLE_POLICIES" || true
 
 read -r CALLER_ACCOUNT CALLER_ARN <<<"$(aws sts get-caller-identity --query '[Account,Arn]' --output text)"
 
@@ -125,7 +125,7 @@ else
   echo "absent role: ${IAM_ROLE_NAME}"
 fi
 
-for group in "${GROUPS[@]}"; do
+for group in "${GROUP_LIST[@]}"; do
   if ! aws iam get-group --group-name "$group" >/dev/null 2>&1; then
     echo "absent group: ${group}"
     continue

@@ -167,7 +167,7 @@ Scripts read `.env` with a line parser. They do not `source` it. Never commit `.
 | Key | Purpose |
 |---|---|
 | `AWS_PROFILE` | CLI profile. Root for apply and teardown, IAM user for daily work |
-| `REGION` | Project Region, `eu-north-1` |
+| `REGION` | Project Region, `eu-north-1`. Scripts export this value as `AWS_REGION` for the AWS CLI |
 | `AWS_ACCOUNT_ID` | Account check, and `__AWS_ACCOUNT_ID__` in IAM documents |
 | `AWS_IAM_USER_ARN` | Daily IAM user, and `__AWS_IAM_USER_ARN__` in the `llm-cli` trust policy |
 | `AWS_BUDGETS_REGION` | `us-east-1` |
