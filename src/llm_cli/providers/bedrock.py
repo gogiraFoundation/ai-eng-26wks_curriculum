@@ -63,8 +63,9 @@ class BedrockProvider:
 
         started = time.perf_counter()
         text = ""
-        in_tok = out_tok = 0
-        latency_ms = 0.0
+        in_tok: int | None = None
+        out_tok: int | None = None
+        latency_ms: float | None = None
         response = self.client.converse_stream(**kwargs)
         for event in response["stream"]:
             if "contentBlockDelta" in event:
@@ -73,13 +74,24 @@ class BedrockProvider:
                     text += piece
                     yield piece
             elif "metadata" in event:
-                usage = event["metadata"].get("usage", {})
-                in_tok = int(usage.get("inputTokens") or 0)
-                out_tok = int(usage.get("outputTokens") or 0)
-                latency_ms = float(event["metadata"].get("metrics", {}).get("latencyMs") or 0)
+                # Usage arrives on a terminal metadata event, not with text deltas.
+                usage = event["metadata"].get("usage") or {}
+                if "inputTokens" in usage:
+                    in_tok = int(usage["inputTokens"])
+                if "outputTokens" in usage:
+                    out_tok = int(usage["outputTokens"])
+                metrics = event["metadata"].get("metrics") or {}
+                if "latencyMs" in metrics:
+                    latency_ms = float(metrics["latencyMs"])
 
-        if not latency_ms:
+        # Stream ends when the event iterator is exhausted; last_result is set below.
+        if latency_ms is None:
             latency_ms = (time.perf_counter() - started) * 1000
+        if in_tok is None:
+            # Estimate only when Bedrock omitted usage; keep a reported zero.
+            in_tok = max(1, len(str(messages)) // 4)
+        if out_tok is None:
+            out_tok = max(1, len(text) // 4) if text else 0
         cost = (in_tok / 1000) * BEDROCK_INPUT_USD_PER_1K + (out_tok / 1000) * BEDROCK_OUTPUT_USD_PER_1K
         self._last = TurnResult(
             text=text,

@@ -12,8 +12,13 @@ class Session:
     cost_usd: float = 0.0
 
     def __post_init__(self) -> None:
+        # Always bootstrap from system_prompt so clear() can restore the same state.
+        self.messages = self._initial_messages()
+
+    def _initial_messages(self) -> list[dict]:
         if self.system_prompt:
-            self.messages = [{"role": "system", "content": self.system_prompt}]
+            return [{"role": "system", "content": self.system_prompt}]
+        return []
 
     def add_user(self, text: str) -> None:
         self.messages.append({"role": "user", "content": text})
@@ -22,7 +27,7 @@ class Session:
         self.messages.append({"role": "assistant", "content": text})
 
     def clear(self) -> None:
-        self.messages = [{"role": "system", "content": self.system_prompt}] if self.system_prompt else []
+        self.messages = self._initial_messages()
         self.input_tokens = 0
         self.output_tokens = 0
         self.cost_usd = 0.0
