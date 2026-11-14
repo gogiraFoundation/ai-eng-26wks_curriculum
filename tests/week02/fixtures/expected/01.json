@@ -1,0 +1,15 @@
+{
+    "invoice_id": "INV-1001",
+    "invoice_date": "2026-11-13",
+    "vendor": "Acme Inc.",
+    "currency": "USD",
+    "total": "100.00",
+    "line_items": [
+      {
+        "description": "Product A",
+        "quantity": 1,
+        "unit_price": "100.00",
+        "total": "100.00"
+      }
+    ]
+  }

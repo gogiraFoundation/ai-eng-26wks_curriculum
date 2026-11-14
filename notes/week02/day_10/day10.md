@@ -6,7 +6,8 @@
 **Profile / region:** `agent-toolkit` / `eu-north-1`  
 **Caller:** `arn:aws:iam::767397880814:user/afrotyche@gmail.com`  
 **Theory:** [day_10_notes.md](./day_10_notes.md)  
-**Depends on:** Day 6 Bedrock auth (IAM user + `botocore[crt]`)
+**Depends on:** Day 6 Bedrock auth (IAM user + `botocore[crt]`)  
+**Free resources:** Amazon Bedrock tool use; Anthropic Claude tool-use overview (concepts transfer)
 
 ## Task status
 
@@ -15,6 +16,7 @@
 - [x] Stop on `end_turn` (max 5 iterations)
 - [x] Print each tool call name + input (+ result)
 - [x] Lab run recorded below
+- [x] Self-check: `tool_use` vs `end_turn` (answered below)
 
 ## Loop shape
 
@@ -48,6 +50,15 @@ tool_result={"city": "Stockholm", "celsius": 18, "condition": "cloudy"}
 stopReason=end_turn
 assistant: The current weather in Stockholm is cloudy with a temperature of 18 degrees Celsius.
 ```
+
+## Self-check: `tool_use` vs `end_turn`
+
+| `stopReason` | Meaning | What your code must do |
+|---|---|---|
+| `tool_use` | Model wants a function run; assistant message has `toolUse` block(s) | Execute the tool(s), append a user message with matching `toolResult` / `toolUseId`, call `converse` again |
+| `end_turn` | Model is finished; usually text only | Stop the loop; print/return the final assistant text |
+
+In this lab: iteration 1 was `tool_use`; iteration 2 was `end_turn`.
 
 ## Commands
 
