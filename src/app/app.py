@@ -46,6 +46,7 @@ def stub_generate(prompt: str) -> str:
 @app.post("/extract", response_model=Invoice)
 def extract(body: ExtractRequest) -> Invoice:
     request_id = str(uuid.uuid4())
+    retries = 0
     try:
         invoice, retries = extract_with_retry(
             body.text,
@@ -53,12 +54,15 @@ def extract(body: ExtractRequest) -> Invoice:
             max_retries=1,
         )
     except Exception as exc:
+        # extract_with_retry attaches .retries on parse/validation failure.
+        # Other exceptions never assign the unpack target, so default to 0.
+        failed_retries = getattr(exc, "retries", retries)
         log.info(
             json.dumps(
                 {
                     "event": "extract_failed",
                     "request_id": request_id,
-                    "retries": 1,
+                    "retries": failed_retries,
                     "error": f"{type(exc).__name__}: {exc}",
                 }
             )
