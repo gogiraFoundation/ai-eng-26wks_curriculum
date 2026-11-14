@@ -87,4 +87,7 @@ def extract_with_retry(
             )
 
     assert last_exc is not None
+    # Keep the original exception type for callers/tests; attach the retry
+    # count so logging can report attempts used, not max_retries.
+    setattr(last_exc, "retries", retries)
     raise last_exc
