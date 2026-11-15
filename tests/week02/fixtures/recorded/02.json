@@ -1,0 +1,15 @@
+{
+  "invoice_id": "INV-1002",
+  "invoice_date": "2026-01-05",
+  "vendor": "Berlin Supplies GmbH",
+  "currency": "EUR",
+  "total": "25.00",
+  "line_items": [
+    {
+      "description": "Widgets",
+      "quantity": 2,
+      "unit_price": "12.50",
+      "total": "25.00"
+    }
+  ]
+}

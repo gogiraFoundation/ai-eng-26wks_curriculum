@@ -1,0 +1,6 @@
+inv: INV-1004
+date:2026-03-01
+vendor:  CloudNine SaaS
+currency:USD
+item Seat licence | qty 5 | unit 9.99 | line 49.95
+total=49.95

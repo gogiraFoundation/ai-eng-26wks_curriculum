@@ -1,0 +1,6 @@
+INVOICE #INV-1002
+Issued 2026-01-05
+From: Berlin Supplies GmbH
+EUR
+Widgets x2 @ 12.50 = 25.00
+TOTAL 25.00

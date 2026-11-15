@@ -1,0 +1,5 @@
+Invoice INV-1007 dated 2026-04-18 from Harbor Hardware (USD).
+Nails x100 @ 0.05 = 5.00
+Hammer x1 @ 15.00 = 15.00
+Tape x2 @ 2.50 = 5.00
+TOTAL 25.00

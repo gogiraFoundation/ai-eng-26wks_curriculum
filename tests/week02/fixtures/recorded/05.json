@@ -1,0 +1,15 @@
+{
+  "invoice_id": "INV-1005",
+  "invoice_date": "2026-03-20",
+  "vendor": "Cafe Lumiere",
+  "currency": "EUR",
+  "total": "12.00",
+  "line_items": [
+    {
+      "description": "Cafe",
+      "quantity": 3,
+      "unit_price": "4.00",
+      "total": "12.00"
+    }
+  ]
+}
