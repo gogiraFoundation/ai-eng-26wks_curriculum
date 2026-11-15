@@ -1,5 +1,5 @@
 # AI Engineering: 26-Week Plan (AWS Track)
-
+[![pytest](https://github.com/OWNER/REPO/actions/workflows/pytest.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/pytest.yml)
 A 26-week, project-based plan to become an AI / LLM engineer and pass the **AWS Certified Machine Learning Engineer – Associate (MLA-C02)** exam.
 
 **Owner:** gogirafoundation@gmail.com
