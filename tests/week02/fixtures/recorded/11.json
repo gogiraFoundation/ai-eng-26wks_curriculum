@@ -1,0 +1,21 @@
+{
+  "invoice_id": "INV-1011",
+  "invoice_date": "2026-07-01",
+  "vendor": "SoftServe EU",
+  "currency": "EUR",
+  "total": "230.00",
+  "line_items": [
+    {
+      "description": "Support plan",
+      "quantity": 1,
+      "unit_price": "80.00",
+      "total": "80.00"
+    },
+    {
+      "description": "Onboarding",
+      "quantity": 1,
+      "unit_price": "150.00",
+      "total": "150.00"
+    }
+  ]
+}

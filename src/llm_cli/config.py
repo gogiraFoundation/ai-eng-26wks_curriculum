@@ -1,0 +1,13 @@
+DEFAULT_PROVIDER = "direct"
+DEFAULT_OLLAMA_MODEL = "qwen2.5:7b"
+DEFAULT_BEDROCK_MODEL = "eu.amazon.nova-micro-v1:0"
+DEFAULT_OLLAMA_URL = "http://127.0.0.1:11434/api/chat"
+DEFAULT_AWS_PROFILE = "agent-toolkit"
+DEFAULT_AWS_REGION = "eu-north-1"
+DEFAULT_TEMPERATURE = 0.0
+DEFAULT_TOP_P = 0.9
+DEFAULT_MAX_TOKENS = 200
+DEFAULT_KEEP_ALIVE = "10m"
+# Document rates + date when you fill these from the Bedrock pricing page.
+BEDROCK_INPUT_USD_PER_1K = 0.000035
+BEDROCK_OUTPUT_USD_PER_1K = 0.00014

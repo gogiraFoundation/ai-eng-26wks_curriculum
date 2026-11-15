@@ -1,0 +1,21 @@
+{
+  "invoice_id": "INV-1003",
+  "invoice_date": "2026-02-14",
+  "vendor": "Thames Office Ltd",
+  "currency": "GBP",
+  "total": "75.00",
+  "line_items": [
+    {
+      "description": "Paper A4",
+      "quantity": 10,
+      "unit_price": "3.00",
+      "total": "30.00"
+    },
+    {
+      "description": "Toner",
+      "quantity": 1,
+      "unit_price": "45.00",
+      "total": "45.00"
+    }
+  ]
+}

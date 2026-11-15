@@ -1,0 +1,15 @@
+{
+  "invoice_id": "INV-1014",
+  "invoice_date": "2026-09-15",
+  "vendor": "Zurich Optics AG",
+  "currency": "EUR",
+  "total": "399.00",
+  "line_items": [
+    {
+      "description": "Lens kit",
+      "quantity": 1,
+      "unit_price": "399.00",
+      "total": "399.00"
+    }
+  ]
+}

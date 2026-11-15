@@ -1,0 +1,15 @@
+{
+  "invoice_id": "INV-1013",
+  "invoice_date": "2026-08-08",
+  "vendor": "BulkPack Inc",
+  "currency": "USD",
+  "total": "20.00",
+  "line_items": [
+    {
+      "description": "Zip ties",
+      "quantity": 1000,
+      "unit_price": "0.02",
+      "total": "20.00"
+    }
+  ]
+}

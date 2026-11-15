@@ -1,0 +1,20 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyInvokeWithoutInferenceProfile",
+      "Effect": "Deny",
+      "Action": [
+        "bedrock:InvokeModel",
+        "bedrock:InvokeModelWithResponseStream",
+        "bedrock:CreateModelInvocationJob"
+      ],
+      "Resource": "arn:aws:bedrock:*::foundation-model/*",
+      "Condition": {
+        "Null": {
+          "bedrock:InferenceProfileArn": "true"
+        }
+      }
+    }
+  ]
+}

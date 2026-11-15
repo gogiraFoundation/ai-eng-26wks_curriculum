@@ -1,0 +1,46 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ReadOwnUser",
+      "Effect": "Allow",
+      "Action": [
+        "iam:GetUser",
+        "iam:ListMFADevices",
+        "iam:ListGroupsForUser",
+        "iam:ListAttachedUserPolicies",
+        "iam:ListUserPolicies",
+        "iam:ChangePassword",
+        "iam:GetLoginProfile"
+      ],
+      "Resource": "arn:aws:iam::__AWS_ACCOUNT_ID__:user/${aws:username}"
+    },
+    {
+      "Sid": "ManageOwnMfa",
+      "Effect": "Allow",
+      "Action": [
+        "iam:CreateVirtualMFADevice",
+        "iam:DeleteVirtualMFADevice",
+        "iam:EnableMFADevice",
+        "iam:DeactivateMFADevice",
+        "iam:ResyncMFADevice"
+      ],
+      "Resource": [
+        "arn:aws:iam::__AWS_ACCOUNT_ID__:user/${aws:username}",
+        "arn:aws:iam::__AWS_ACCOUNT_ID__:mfa/${aws:username}"
+      ]
+    },
+    {
+      "Sid": "ListOwnMfa",
+      "Effect": "Allow",
+      "Action": "iam:ListVirtualMFADevices",
+      "Resource": "*"
+    },
+    {
+      "Sid": "ReadAccountPasswordPolicy",
+      "Effect": "Allow",
+      "Action": "iam:GetAccountPasswordPolicy",
+      "Resource": "*"
+    }
+  ]
+}
