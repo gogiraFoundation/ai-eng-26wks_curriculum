@@ -1,0 +1,15 @@
+{
+  "invoice_id": "INV-1008",
+  "invoice_date": "2026-05-09",
+  "vendor": "Atlas Print",
+  "currency": "EUR",
+  "total": "20.00",
+  "line_items": [
+    {
+      "description": "Brochures",
+      "quantity": 50,
+      "unit_price": "0.40",
+      "total": "20.00"
+    }
+  ]
+}

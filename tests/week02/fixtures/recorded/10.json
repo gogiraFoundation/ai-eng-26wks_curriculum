@@ -1,0 +1,15 @@
+{
+  "invoice_id": "INV-1010",
+  "invoice_date": "2026-06-11",
+  "vendor": "Pacific Freight Co",
+  "currency": "USD",
+  "total": "220.00",
+  "line_items": [
+    {
+      "description": "Shipping lane A",
+      "quantity": 1,
+      "unit_price": "220.00",
+      "total": "220.00"
+    }
+  ]
+}

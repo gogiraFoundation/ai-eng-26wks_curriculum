@@ -1,0 +1,15 @@
+{
+  "invoice_id": "INV-1006",
+  "invoice_date": "2026-04-02",
+  "vendor": "Nordic Consulting LLP",
+  "currency": "GBP",
+  "total": "960.00",
+  "line_items": [
+    {
+      "description": "Advisory hours",
+      "quantity": 8,
+      "unit_price": "120.00",
+      "total": "960.00"
+    }
+  ]
+}

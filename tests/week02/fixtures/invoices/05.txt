@@ -1,0 +1,6 @@
+Facture INV-1005
+Date: 2026-03-20
+Fournisseur: Cafe Lumiere
+Devise: EUR
+Cafe x3 @ 4.00 = 12.00
+Total: 12.00

@@ -1,0 +1,15 @@
+{
+  "invoice_id": "INV-1009",
+  "invoice_date": "2026-05-30",
+  "vendor": "Meadow Farm Organics",
+  "currency": "GBP",
+  "total": "13.00",
+  "line_items": [
+    {
+      "description": "Eggs (box)",
+      "quantity": 4,
+      "unit_price": "3.25",
+      "total": "13.00"
+    }
+  ]
+}
