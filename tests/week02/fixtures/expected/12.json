@@ -1,0 +1,15 @@
+{
+  "invoice_id": "INV-1012",
+  "invoice_date": "2026-07-22",
+  "vendor": "Bright Lamps UK",
+  "currency": "GBP",
+  "total": "36.00",
+  "line_items": [
+    {
+      "description": "Lamp shade",
+      "quantity": 2,
+      "unit_price": "18.00",
+      "total": "36.00"
+    }
+  ]
+}

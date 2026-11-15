@@ -1,0 +1,7 @@
+Invoice INV-1011
+Date 2026-07-01
+Vendor: SoftServe EU
+Currency EUR
+Support plan x1 @ 80.00 = 80.00
+Onboarding x1 @ 150.00 = 150.00
+Total 230.00

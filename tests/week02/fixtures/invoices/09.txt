@@ -1,0 +1,7 @@
+*** TAX INVOICE ***
+No. INV-1009
+Invoice Date: 2026-05-30
+Bill From: Meadow Farm Organics
+Currency Code: GBP
+Eggs (box) x4 @ 3.25 = 13.00
+Amount Payable: 13.00

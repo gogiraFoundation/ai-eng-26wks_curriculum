@@ -37,6 +37,8 @@
 
 Copy the finished table into the README.
 
+
+
 ## Results (tests)
 
 | Suite | Command | Outcome |
@@ -44,11 +46,19 @@ Copy the finished table into the README.
 | Retry unit tests | `PYTHONPATH=src .venv/bin/pytest tests/week02/test_invoice_retry.py -v` | |
 | Extract / accuracy | `PYTHONPATH=src .venv/bin/pytest tests/week02/test_extract_accuracy.py -v` | |
 
+Field	                        Correct / 15
+invoice_id                      15/15
+invoice_date                    15/15
+vendor                          15/15
+currency                        15/15
+total                           15/15
+line_items                      15/15
+
 ## Commands
 
 ```bash
 # keep Day 9 green
 PYTHONPATH=src .venv/bin/pytest tests/week02/ -v
 
-# API smoke (generator may still be stub or recorded)
+# API smoke 
 PYTHONPATH=src .venv/bin/uvicorn app:app --app-dir src --reload --port 8000

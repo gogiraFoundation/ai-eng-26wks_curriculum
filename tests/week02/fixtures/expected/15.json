@@ -1,0 +1,15 @@
+{
+  "invoice_id": "INV-1015",
+  "invoice_date": "2026-12-31",
+  "vendor": "YearEnd Audit Partners",
+  "currency": "GBP",
+  "total": "1500.00",
+  "line_items": [
+    {
+      "description": "Year-end review",
+      "quantity": 1,
+      "unit_price": "1500.00",
+      "total": "1500.00"
+    }
+  ]
+}
