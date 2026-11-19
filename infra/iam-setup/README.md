@@ -17,6 +17,7 @@ Do not commit `.env`.
 | `policies/bedrock-invoke-nova.json` | Invoke Nova Micro and Nova Lite via EU inference profiles |
 | `policies/bedrock-require-inference-profile.json` | Deny bare foundation-model invoke (no profile ARN) |
 | `policies/bedrock-deny-expensive.json` | Deny Opus and provisioned throughput |
+| `policies/bedrock-prompt-management.json` | Create/get prompts and invoke managed prompt version ARNs |
 | `policies/budgets-read.json` | Read budgets and Cost Explorer |
 | `policies/iam-read.json` | Read IAM users, groups, roles, and policies |
 | `policies/assume-llm-cli.json` | Allow `sts:AssumeRole` on `llm-cli` |

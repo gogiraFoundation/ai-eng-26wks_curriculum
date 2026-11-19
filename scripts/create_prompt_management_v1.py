@@ -1,5 +1,5 @@
-# scripts/loader.py
 #!/usr/bin/env python3
+# scripts/create_prompt_management_v1.py
 """Create extract prompt v1 in Prompt Management and Converse once."""
 
 from __future__ import annotations
