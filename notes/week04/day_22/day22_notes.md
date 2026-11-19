@@ -11,3 +11,4 @@ Tick `day22.md` task status:
 - [x] `curl -N` smoke test
 - [ ] Optional: offline pytest with mocks
 - [x] Self-check: SSE vs WebSockets
+

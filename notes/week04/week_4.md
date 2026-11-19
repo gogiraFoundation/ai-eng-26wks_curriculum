@@ -7,21 +7,6 @@ fallback model, CI, README + architecture diagram.
 Exam link (MLA-C02): 3.1.7 (FM hosting/resource allocation), 3.3 (CI/CD), 4.3.8 (credential types),
 4.1 (monitoring
 
-Week 4 (16 Nov - 22 Nov 2026): Production LLM gateway
-Goal: Turn your client code into a deployable service: async, streaming, retries, caching, fallback,
-CI/CD.
-Deliverable: Deployed LLM gateway (ECS Fargate or Lambda) with SSE streaming, Redis cache,
-fallback model, CI, README + architecture diagram.
-Exam link (MLA-C02): 3.1.7 (FM hosting/resource allocation), 3.3 (CI/CD), 4.3.8 (credential types),
-4.1 (monitoring).
-Day 22 · 
-Day 23 · Tue 17 Nov 2026 · Timeouts, retries, backoff with jitter, idempotency
-Time: 75 min. 30m AWS Builders’ Library article on timeouts, retries and jitter · 35m wrap model
-calls with per-attempt timeout, capped exponential backoff + full jitter, retry only on throttling/5xx ·
-10m add an idempotency key header for non-streaming calls.
-Free resources: AWS Builders’ Library: Timeouts, retries and backoff with jitter
-Task: Unit test that simulates 2 throttles then success and asserts total retries and delay bounds.
-Check yourself: Why add jitter to backoff, and which errors should never be retried?
 Day 24 · Wed 18 Nov 2026 · Caching and fallback models
 Time: 75 min. 20m Redis docs (strings, TTL) + Bedrock inference profiles (cross-region) · 40m
 response cache keyed on hash(prompt_version, model, input), TTL 1h; fallback to a cheaper model
