@@ -143,6 +143,11 @@ def run_benchmark() -> None:
                 print(f"[{variant}] {cid} parse failed: {exc}", flush=True)
 
         n = len(score_ids)
+        if n == 0:
+            print(f"| `{variant}` | 0 | 0/0 (-) | - | - | - | - |")
+            print(f"# fields `{variant}`: no scoreable invoices", flush=True)
+            continue
+
         correct = sum(hits.values())
         possible = n * len(FIELDS)
         mean_in = sum(in_toks) / n

@@ -36,8 +36,8 @@ AWS managed policy (attach by name, do not copy into this repo): `SignInLocalDev
 
 | Principal | Attach |
 |-----------|--------|
-| Group `research_and_development` | `console-self`, `SignInLocalDevelopmentAccess`, `bedrock-discover`, `bedrock-invoke-nova`, `bedrock-require-inference-profile`, `bedrock-deny-expensive`, `assume-llm-cli` |
-| Group `admins` | `console-self`, `SignInLocalDevelopmentAccess`, `iam-read`, `budgets-read`, `bedrock-discover`, `bedrock-deny-expensive` |
+| Group `research_and_development` | `console-self`, `SignInLocalDevelopmentAccess`, `bedrock-discover`, `bedrock-invoke-nova`, `bedrock-require-inference-profile`, `bedrock-deny-expensive`, `bedrock-prompt-management`, `assume-llm-cli` |
+| Group `admins` | `console-self`, `SignInLocalDevelopmentAccess`, `iam-read`, `budgets-read`, `bedrock-discover`, `bedrock-deny-expensive`, `bedrock-prompt-management` |
 | Group `shared_resource_manager` | `console-self`, `SignInLocalDevelopmentAccess`, `budgets-read` |
 | Group `user_clients` | (none) |
 | Role `llm-cli` | `bedrock-invoke-nova`, `bedrock-require-inference-profile`, `bedrock-deny-expensive` |
@@ -60,7 +60,7 @@ The scripts read these keys from `.env`. They do not `source` the file. `.env.ex
 | `AWS_BUDGETS_REGION` | `us-east-1` |
 | `BUDGET_NAMES` | `MonthlyCostBudget\|My Zero-Spend Budget` |
 
-`policies/console-self.json`, `policies/assume-llm-cli.json`, `policies/bedrock-invoke-nova.json`, and `roles/llm-cli-trust.json` use `__AWS_ACCOUNT_ID__`, `__AWS_IAM_USER_ARN__`, and `__IAM_ROLE_NAME__`. `iam-security.sh` and `iam-roles.sh` substitute those tokens from `.env` into a temporary document before each upload. The files in the repo are not rewritten.
+`policies/console-self.json`, `policies/assume-llm-cli.json`, `policies/bedrock-invoke-nova.json`, `policies/bedrock-prompt-management.json`, and `roles/llm-cli-trust.json` use `__AWS_ACCOUNT_ID__`, `__AWS_IAM_USER_ARN__`, and `__IAM_ROLE_NAME__`. `iam-security.sh` and `iam-roles.sh` substitute those tokens from `.env` into a temporary document before each upload. The files in the repo are not rewritten.
 
 ## Apply (root only)
 

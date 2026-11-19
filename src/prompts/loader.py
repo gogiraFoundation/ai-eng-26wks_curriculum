@@ -16,7 +16,15 @@ def load_prompt(name: str, version: str) -> dict[str, Any]:
     data = yaml.safe_load(path.read_text(encoding="utf-8"))
     if not isinstance(data, dict):
         raise ValueError(f"prompt file must be a mapping: {path}")
-    for key in ("name", "version", "system", "user_template", "model", "temperature"):
+    for key in (
+        "name",
+        "version",
+        "system",
+        "user_template",
+        "model",
+        "temperature",
+        "max_tokens",
+    ):
         if key not in data:
             raise KeyError(f"missing {key} in {path}")
     return data
