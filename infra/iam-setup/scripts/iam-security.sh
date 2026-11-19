@@ -25,6 +25,7 @@ POLICIES=(
   bedrock-invoke-nova
   bedrock-require-inference-profile
   bedrock-deny-expensive
+  bedrock-prompt-management
   budgets-read
   iam-read
   assume-llm-cli
@@ -192,6 +193,7 @@ attach_group research_and_development bedrock-discover
 attach_group research_and_development bedrock-invoke-nova
 attach_group research_and_development bedrock-require-inference-profile
 attach_group research_and_development bedrock-deny-expensive
+attach_group research_and_development bedrock-prompt-management
 attach_group research_and_development assume-llm-cli
 
 attach_group admins console-self
@@ -200,6 +202,7 @@ attach_group admins iam-read
 attach_group admins budgets-read
 attach_group admins bedrock-discover
 attach_group admins bedrock-deny-expensive
+attach_group admins bedrock-prompt-management
 
 attach_group shared_resource_manager console-self
 attach_group shared_resource_manager "$SIGN_IN_POLICY"

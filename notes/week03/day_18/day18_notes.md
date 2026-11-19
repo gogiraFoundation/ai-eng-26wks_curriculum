@@ -1,7 +1,3 @@
-
-Also paste a short `day18_notes.md` if it is still empty:
-
-```markdown
 # Day 18 notes: prompt versioning
 
 **Lab log:** [day18.md](./day18.md)  
