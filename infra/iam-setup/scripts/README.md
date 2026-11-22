@@ -9,6 +9,7 @@ Wrappers for `../README.md`. They read `.env` and do not `source` it. `infra/run
 | `iam-roles.sh` | Create `IAM_ROLE_NAME`, fill the trust policy from `.env`, and attach `IAM_ROLE_POLICIES`. An attachment already present is skipped |
 | `iam-assign-users.sh` | Put `AWS_IAM_USER_ARN` in `IAM_USER_GROUP` only, and detach policies on that user |
 | `iam-budgets.sh` | Read `BUDGET_NAMES` in `AWS_BUDGETS_REGION`. Does not create a budget |
-| `iam-destroy-resource.sh` | Undo the groups, customer policies, and role. Requires the argument `destroy` |
+| `iam-destroy-resource.sh` | **Billable compute only** (report / `teardown`). Never touches IAM or Bedrock policies |
+| `iam-destroy-lab-iam.sh` | DANGER: undo lab groups/policies/role. Argument: `destroy`. Breaks Bedrock until `run-setup.sh` |
 
-`iam-destroy-resource.sh` does not delete the IAM user, the budgets, or `SignInLocalDevelopmentAccess`. Hourly resources are `infra/session-resources.sh`, not this directory.
+`iam-destroy-resource.sh` lists or tears down SageMaker, NAT, ALB, RDS (stop), ECS services (scale 0 / delete), and reports ECR. It does **not** delete IAM. For IAM wipe use `iam-destroy-lab-iam.sh destroy` (root). Same billable scan also lives in `infra/session-resources.sh`.
