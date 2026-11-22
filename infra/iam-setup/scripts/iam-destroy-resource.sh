@@ -20,6 +20,7 @@ POLICIES=(
   bedrock-invoke-nova
   bedrock-require-inference-profile
   bedrock-deny-expensive
+  bedrock-prompt-management
   budgets-read
   iam-read
   assume-llm-cli

@@ -1,0 +1,30 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "PromptManagementCrud",
+      "Effect": "Allow",
+      "Action": [
+        "bedrock:CreatePrompt",
+        "bedrock:UpdatePrompt",
+        "bedrock:GetPrompt",
+        "bedrock:ListPrompts",
+        "bedrock:CreatePromptVersion",
+        "bedrock:RenderPrompt"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "InvokeManagedPromptVersions",
+      "Effect": "Allow",
+      "Action": [
+        "bedrock:InvokeModel",
+        "bedrock:InvokeModelWithResponseStream"
+      ],
+      "Resource": [
+        "arn:aws:bedrock:eu-north-1:__AWS_ACCOUNT_ID__:prompt/*",
+        "arn:aws:bedrock:eu-north-1:__AWS_ACCOUNT_ID__:prompt/*:*"
+      ]
+    }
+  ]
+}

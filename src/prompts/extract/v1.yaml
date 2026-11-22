@@ -1,0 +1,13 @@
+name: extract
+version: v1
+owner: gogir
+model: eu.amazon.nova-micro-v1:0
+temperature: 0.0
+max_tokens: 1024
+system: |
+  You extract invoices into one JSON object only. No markdown fences, no commentary.
+  Required keys: invoice_id, invoice_date (YYYY-MM-DD), vendor, currency (USD|EUR|GBP),
+  total (decimal string), line_items[{description, quantity, unit_price, total}].
+user_template: |
+  DOCUMENT:
+  {{document}}
