@@ -72,7 +72,7 @@ aws sts get-caller-identity --profile agent-toolkit
 
 Expected: an `Account` and `Arn` are returned.
 
-Root on `agent-toolkit` is only for `run-setup.sh`, `iam-destroy-resource.sh destroy`, and `session-resources.sh teardown`. Daily work is the IAM user `iam-user@example.com`. Sign the profile back in as that user when the root command finishes. Do not create long-lived access keys. IAM Identity Center is not set up yet.
+Root on `agent-toolkit` is only for `run-setup.sh`, `iam-destroy-lab-iam.sh destroy`, `iam-destroy-resource.sh teardown`, and `session-resources.sh teardown`. Daily work is the IAM user `iam-user@example.com`. Sign the profile back in as that user when the root command finishes. Do not create long-lived access keys. IAM Identity Center is not set up yet.
 
 ### 3.3 Billing protection
 
@@ -211,10 +211,17 @@ bash infra/session-resources.sh
 bash infra/session-resources.sh teardown
 ```
 
-Exit code 2 on the first command means something is still listed. IAM undo, which does not stop an hourly bill:
+Exit code 2 on the first command means something is still listed. Billable compute (does not touch IAM/Bedrock):
 
 ```bash
-bash infra/iam-setup/scripts/iam-destroy-resource.sh destroy
+bash infra/iam-setup/scripts/iam-destroy-resource.sh
+bash infra/iam-setup/scripts/iam-destroy-resource.sh teardown
+```
+
+IAM undo (breaks Bedrock until `run-setup.sh`; does not stop an hourly bill):
+
+```bash
+bash infra/iam-setup/scripts/iam-destroy-lab-iam.sh destroy
 ```
 
 ---

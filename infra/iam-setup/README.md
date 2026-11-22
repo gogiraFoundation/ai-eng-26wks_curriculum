@@ -27,7 +27,8 @@ Do not commit `.env`.
 | `scripts/iam-roles.sh` | Create `IAM_ROLE_NAME` and attach `IAM_ROLE_POLICIES` |
 | `scripts/iam-assign-users.sh` | Put the IAM user in `IAM_USER_GROUP` only, and detach policies on that user |
 | `scripts/iam-budgets.sh` | Read `BUDGET_NAMES`. Does not create a budget |
-| `scripts/iam-destroy-resource.sh` | Undo the groups, customer policies, and role. Argument: `destroy` |
+| `scripts/iam-destroy-resource.sh` | Find/tear down billable compute only (not IAM). Modes: report, `teardown` |
+| `scripts/iam-destroy-lab-iam.sh` | DANGER: undo lab IAM groups/policies/role. Argument: `destroy` (breaks Bedrock) |
 | `scripts/README.md` | What each script does |
 | `../run-setup.sh` | Run the five scripts in that order |
 
@@ -104,12 +105,20 @@ aws sts assume-role \
   --profile agent-toolkit
 ```
 
-## Remove the IAM setup (root only)
-
-This deletes the groups, the eight customer managed policies, and role `llm-cli`. It leaves the IAM user, both budgets, and `SignInLocalDevelopmentAccess`.
+## Billable compute (safe; does not touch Bedrock IAM)
 
 ```bash
-bash infra/iam-setup/scripts/iam-destroy-resource.sh destroy
+bash infra/iam-setup/scripts/iam-destroy-resource.sh            # report
+bash infra/iam-setup/scripts/iam-destroy-resource.sh teardown   # root; stop/delete compute
+```
+
+## Remove the IAM setup (root only; breaks Bedrock)
+
+This deletes the groups, the customer managed policies (including bedrock-*), and role `llm-cli`. It leaves the IAM user, both budgets, and `SignInLocalDevelopmentAccess`. Re-run `run-setup.sh` afterwards to restore Bedrock.
+
+```bash
+bash infra/iam-setup/scripts/iam-destroy-lab-iam.sh destroy
+```
 
 ## Notes
 

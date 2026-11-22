@@ -26,4 +26,7 @@ Sign in as root on `agent-toolkit` and confirm the Arn ends in `:root`. From the
 ```bash
 bash infra/run-setup.sh
 bash infra/session-resources.sh
-bash infra/iam-setup/scripts/iam-destroy-resource.sh destroy
+bash infra/iam-setup/scripts/iam-destroy-resource.sh            # billable report
+bash infra/iam-setup/scripts/iam-destroy-resource.sh teardown   # billable teardown (root)
+bash infra/iam-setup/scripts/iam-destroy-lab-iam.sh destroy     # IAM wipe; breaks Bedrock
+```

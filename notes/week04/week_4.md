@@ -11,15 +11,6 @@ Day 26 · Fri 20 Nov 2026 · Rest
 Rest day. No study. Optional: a walk, sleep, and 5 minutes jotting down anything that confused you this
 week.
 
-
-Day 28 · Sun 22 Nov 2026 · Ship + review + exam hour
-Time: 2 h. 40m README: features, latency/cost numbers, diagram, how to run · 40m Skill Builder
-Bedrock course module on Bedrock APIs · 20m exam-map: 3.1.7, 3.3, 4.3.8 · 20m review; confirm
-budget alarm has not fired.
-Free resources: Skill Builder: Building Generative AI Applications Using Amazon Bedrock (free);
-Official MLA-C02 exam guide (domains, task statements); AWS Budgets user guide
-Task: Tag gateway-v1.0 ; Phase 1 done. Destroy any running stack you do not need.
-Check yourself: What is your gateway’s p95 latency and cost per 1k requests?
 Phase 2 · Retrieval and RAG
 Week 5 (23 Nov - 29 Nov 2026): Embeddings and vector search
 Goal: Understand embeddings and ANN indexes; build semantic search on pgvector and try S3
