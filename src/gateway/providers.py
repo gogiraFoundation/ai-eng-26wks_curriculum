@@ -33,6 +33,14 @@ def sse_frame(event: str, data: dict[str, Any]) -> str:
     return f"event: {event}\ndata: {json.dumps(data, ensure_ascii=False)}\n\n"
 
 
+def _bedrock_session(*, region: str) -> boto3.Session:
+    """Local: AWS_PROFILE (e.g. agent-toolkit). ECS/Fargate: omit profile → task role."""
+    profile = os.getenv("AWS_PROFILE")  # no default — critical for containers
+    if profile:
+        return boto3.Session(profile_name=profile, region_name=region)
+    return boto3.Session(region_name=region)
+
+
 class OllamaProvider:
     def __init__(self, base_url: str | None = None) -> None:
         self.url = base_url or os.getenv(
@@ -100,7 +108,6 @@ class BedrockProvider:
     """ConverseStream via asyncio.to_thread (boto3 is sync; buffers until done)."""
 
     def __init__(self) -> None:
-        self.profile = os.getenv("AWS_PROFILE", "agent-toolkit")
         self.region = os.getenv("AWS_REGION", "eu-north-1")
         self.default_model = os.getenv(
             "BEDROCK_MODEL", "eu.amazon.nova-micro-v1:0"
@@ -116,9 +123,7 @@ class BedrockProvider:
     ) -> list[tuple[str, dict[str, Any]]]:
         out: list[tuple[str, dict[str, Any]]] = []
         try:
-            session = boto3.Session(
-                profile_name=self.profile, region_name=self.region
-            )
+            session = _bedrock_session(region=self.region)
             client = session.client(
                 "bedrock-runtime",
                 config=Config(retries={"max_attempts": 5, "mode": "adaptive"}),
@@ -212,5 +217,3 @@ def get_provider(name: str) -> StreamProvider:
     if name == "bedrock":
         return BedrockProvider()
     raise ValueError(f"Unsupported LLM_PROVIDER: {name}")
-
-    
